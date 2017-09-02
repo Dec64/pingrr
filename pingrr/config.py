@@ -20,6 +20,7 @@ def str2bool(v):
 
 
 def create_config():
+    print "\n" * 100
     sonarr_host = raw_input("Enter URL for your sonarr server, normally http://localhost:8989: \n")
     print "\n" * 100
     sonarr_quality_profile = raw_input("Enter the quality profile you want to add new shows as: \n")
