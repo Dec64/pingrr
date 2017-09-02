@@ -18,7 +18,7 @@ from pingrr.notifications import Notifications
 ################################
 
 
-config_path = os.path.join(os.path.dirname(sys.argv[0]), 'config.json')
+config_path = config.conifg_load()
 with open(config_path) as json_data_file:
     conf = json.load(json_data_file)
 
@@ -183,7 +183,4 @@ def filter_list():
 
 
 if __name__ == "__main__":
-    if not os.path.exists('config.json'):
-        logger.info('no config file found, creating one now')
-        config.create_config()
     new_check()

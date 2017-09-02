@@ -1,9 +1,18 @@
 import json
 import logging
 import sys
+import os
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Config")
+
+
+def conifg_load():
+    if os.path.exists('config.json'):
+        path = os.path.join(os.path.dirname(sys.argv[0]), 'config.json')
+        return path
+    else:
+        create_config()
 
 
 def str2bool(v):

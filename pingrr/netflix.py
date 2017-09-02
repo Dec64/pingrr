@@ -1,8 +1,7 @@
 import json
 import requests
 import logging
-import os
-import sys
+import config
 
 import trakt
 
@@ -11,8 +10,7 @@ import trakt
 ################################
 
 
-config_path = os.path.join(os.path.dirname(sys.argv[0]), 'config.json')
-
+config_path = config.conifg_load()
 with open(config_path) as json_data_file:
     conf = json.load(json_data_file)
 
