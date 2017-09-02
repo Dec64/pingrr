@@ -25,7 +25,7 @@ class Pushover:
                 'user': self.user_token,
                 'message': kwargs['message']
             }
-            resp = requests.post('https://api.pushover.net/1/messages.json', data=payload)
+            resp = requests.post('https://api.pushover.net/1/messages.json', data=payload, timeout=5.000)
             return True if resp.status_code == 200 else False
 
         except Exception as ex:

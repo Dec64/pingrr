@@ -37,7 +37,7 @@ headers = {'X-Api-Key': conf['sonarr']['api']}
 
 def qprofile_lookup():
     """Check sonarr quality profile ID"""
-    r = requests.get(url + '/api/profile', headers=headers)
+    r = requests.get(url + '/api/profile', headers=headers, timeout=5.000)
     qprofile_id = r.json()
     x = 0
     for _ in qprofile_id:
@@ -50,7 +50,7 @@ def qprofile_lookup():
 def get_library():
     """Get sonarr library in a list of tvdbid ids"""
     library = []
-    r = requests.get(url + '/api/series', headers=headers)
+    r = requests.get(url + '/api/series', headers=headers, timeout=5.000)
     tv_lib_raw = r.json()
     for n in tv_lib_raw:
         library.append(n['tvdbId'])

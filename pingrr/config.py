@@ -98,7 +98,7 @@ def create_config():
     filters_rating = raw_input("Enter the minimum rating a show must have to be added: \n")
     print "\n" * 100
     # filters_genre = raw_input("Enter the minimum rating a show must have to be added: \n")
-    filters_lang = raw_input("Enter the two letter country code for the language a show must be in(e.g. en): \n")
+    filters_lang = raw_input("Enter the two letter language code for the language a show must be in(e.g. en): \n")
     print "\n" * 100
     filters_end = raw_input("Do you want to add shows that have finished?(yes/no): \n")
     print "\n" * 100

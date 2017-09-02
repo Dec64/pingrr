@@ -74,7 +74,7 @@ def send_to_sonarr(a, b):
     payload = {"tvdbId": a, "title": b, "qualityProfileId": sonarr.qprofile_lookup(), "seasons": [],
                "seasonFolder": True, "rootFolderPath": conf['sonarr']['folder_path'], "addOptions": options,
                "images": []}
-    r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload))
+    r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=5.000)
     global sent
     sent = payload
     if r.status_code == 201:

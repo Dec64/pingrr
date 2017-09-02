@@ -30,7 +30,7 @@ class Slack:
             if self.channel:
                 payload['channel'] = self.channel
 
-            resp = requests.post(self.webhook_url, json=payload)
+            resp = requests.post(self.webhook_url, json=payload, timeout=5.000)
             return True if resp.status_code == 200 else False
 
         except Exception as ex:

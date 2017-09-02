@@ -82,7 +82,7 @@ def get_info(tv_id):
     """Get info for a tv show"""
     url = "https://api.trakt.tv/shows/" + tv_id + "?extended=full"
     logger.debug('getting info from trakt for ', tv_id)
-    r = requests.get(url=url, headers=headers)
+    r = requests.get(url=url, headers=headers, timeout=5.000)
     if r.status_code == requests.codes.ok:
         x = []
         y = r.json()
