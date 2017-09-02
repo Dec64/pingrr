@@ -27,6 +27,9 @@ with open(config_path) as json_data_file:
 ################################
 
 
+if not os.path.exists('logs'):
+    os.makedirs('logs')
+
 log_path = os.path.join(os.path.dirname(sys.argv[0]), 'logs/pingrr.log')
 logging.basicConfig(stream=sys.stdout, format='%(asctime)s - %(levelname)s: %(message)s')
 logger = logging.getLogger("Pingrr")

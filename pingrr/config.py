@@ -106,24 +106,38 @@ def create_config():
     print "\n" * 100
 
     fresh_config = {
-        "sonarr": {"host": sonarr_host, "quality_profile": sonarr_quality_profile, "folder_path": sonarr_folder_path,
-                   "api": sonarr_api}, "trakt": {"api": trakt_api, "limit": 0,
-                                                 "list": {"anticipated": str2bool(trakt_list_anticipated),
-                                                          "popular": str2bool(trakt_list_popular),
-                                                          "trending": str2bool(trakt_list_trending)}},
-        "pingrr": {"timer": int(pingrr_timer), "limit": int(pingrr_limit), "log_level": "info"},
-        "pushover": {"enabled": str2bool(pushover), "user_token": pushover_user_token, "app_token": pushover_app_token},
-        "slack": {"enabled": str2bool(slack), "webhook_url": slack_webhook_url, "sender_name": "Pingrr",
-                  "sender_icon": ":robot_face:", "channel": slack_channel},
-        "filters": {"rating": int(filters_rating), "genre": [""], "language": filters_lang,
-                    "allow_ended": str2bool(filters_end), "allow_canceled": str2bool(filters_cancel)},
-        "unogs": {"api": netflix_api, "country": netflix_country, "days": netflix_days}}
+        "sonarr": {"host": sonarr_host,
+                   "quality_profile": sonarr_quality_profile,
+                   "folder_path": sonarr_folder_path,
+                   "api": sonarr_api},
+        "trakt": {"api": trakt_api,
+                  "limit": 0,
+                  "list": {
+                      "anticipated": str2bool(trakt_list_anticipated),
+                      "popular": str2bool(trakt_list_popular),
+                      "trending": str2bool(trakt_list_trending)}},
+        "pingrr": {"timer": int(pingrr_timer),
+                   "limit": int(pingrr_limit),
+                   "log_level": "info"},
+        "pushover": {"enabled": str2bool(pushover),
+                     "user_token": pushover_user_token,
+                     "app_token": pushover_app_token},
+        "slack": {"enabled": str2bool(slack),
+                  "webhook_url": slack_webhook_url,
+                  "sender_name": "Pingrr",
+                  "sender_icon": ":robot_face:",
+                  "channel": slack_channel},
+        "filters": {"rating": int(filters_rating),
+                    "genre": [""], "language": filters_lang,
+                    "allow_ended": str2bool(filters_end),
+                    "allow_canceled": str2bool(filters_cancel)},
+        "unogs": {"api": netflix_api,
+                  "country": netflix_country,
+                  "days": netflix_days}}
 
     with open('config.json', 'w') as outfile:
         json.dump(fresh_config, outfile)
 
-    print '\033[93m' + "\nIf you have selected more then one list, it is highly recommended that\n" \
-                       "you add filters to avoid spamming Soanrr with rubbish content\n" + '\x1b[0m'
 
     if str2bool(raw_input("Config file created, would you like to start Pingrr now?(yes/no)")):
         pass
