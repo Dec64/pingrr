@@ -1,4 +1,9 @@
 import json
+import logging
+import sys
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger("Config")
 
 
 def str2bool(v):
@@ -81,3 +86,12 @@ def create_config():
 
     with open('config.json', 'w') as outfile:
         json.dump(fresh_config, outfile)
+
+    print '\033[93m' + "\nIf you have selected more then one list, it is highly recommended that\n" \
+                       "you add filters to avoid spamming Soanrr with rubbish content\n" + '\x1b[0m'
+
+    if str2bool(raw_input("Config file created, would you like to start Pingrr now?(yes/no)")):
+        pass
+    else:
+        logger.info('config file created, stopping pingrr')
+        sys.exit()
