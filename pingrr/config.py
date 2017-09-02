@@ -136,11 +136,7 @@ def create_config():
                   "days": netflix_days}}
 
     with open('config.json', 'w') as outfile:
-        json.dump(fresh_config, outfile)
+        json.dump(fresh_config, outfile, indent=4, sort_keys=True)
 
-
-    if str2bool(raw_input("Config file created, would you like to start Pingrr now?(yes/no)")):
-        pass
-    else:
-        logger.info('config file created, stopping pingrr')
-        sys.exit()
+    logger.info('config file created, please check config and re-run Pingrr')
+    sys.exit()

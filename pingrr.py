@@ -180,8 +180,9 @@ def filter_list():
     filtered = []
     for title in raw_list:
         if filter_check(title):
-            logger.debug('adding ', title[0]['title'], ' to the list to send to sonarr')
+            logger.debug('adding ' + title[0]['title'] + ' to the list to check with sonarr')
             filtered.append(title[0])
+    logger.debug(filtered)
     return filtered
 
 
