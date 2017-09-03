@@ -63,5 +63,5 @@ Check it's all running fine by tailing the log
 2. More list sources if found
 3. Easier config generation
 4. Command line arguments.e.g <br />
-`python pingrr.py --conf /my/config/location/conf.json`
+`python pingrr.py --conf /my/config/location/conf.json`<br />
 `python pingrr.py --quality_profile 720p`
