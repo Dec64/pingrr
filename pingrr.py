@@ -3,16 +3,17 @@ import pingrr.sonarr as sonarr
 #import pingrr.netflix as netflix
 import pingrr.config as config
 import pingrr.allflicks as allflicks
+from pingrr.notifications import Notifications
 
 import json
-import requests
-import time
 import logging
 import sys
 import os
 
+from requests import post
+from time import sleep
 from logging.handlers import RotatingFileHandler
-from pingrr.notifications import Notifications
+
 
 ################################
 # Load config
@@ -75,7 +76,7 @@ def send_to_sonarr(a, b):
     payload = {"tvdbId": a, "title": b, "qualityProfileId": conf['sonarr']['quality_profile'], "seasons": [],
                "seasonFolder": True, "rootFolderPath": conf['sonarr']['folder_path'], "addOptions": options,
                "images": []}
-    r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=5.000)
+    r = post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=5.000)
     global sent
     sent = payload
     if r.status_code == 201:
@@ -138,7 +139,7 @@ def new_check():
     if conf['pingrr']['timer'] != 0:
         logger.info('no new shows to add, checking again in ' + str(conf['pingrr']['timer']) + ' hour(s)')
         logger.debug('sleeping for ' + str(delay_time) + ' seconds')
-        time.sleep(float(delay_time))
+        sleep(float(delay_time))
         logger.debug('sleep over, checking again')
         add_shows()
         return True
