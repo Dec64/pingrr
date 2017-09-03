@@ -51,7 +51,7 @@ This is only needed on the first run. Once complete you will need to re run ping
 
 If you intend to leave it running, it would be best to use systemd startup or screen.
 
-`screen -S pingrr python pingrr.py``
+`screen -S pingrr python pingrr.py`
 
 Check it's all running fine by tailing the log
 
