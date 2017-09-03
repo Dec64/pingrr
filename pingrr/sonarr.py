@@ -18,8 +18,8 @@ with open(config_path) as json_data_file:
 ################################
 
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Sonarr")
+logging.basicConfig(level=logging.INFO)
 
 
 ################################

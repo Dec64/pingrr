@@ -19,8 +19,8 @@ with open(config_path) as json_data_file:
 ################################
 
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Netflix")
+logging.basicConfig(level=logging.INFO)
 
 
 ################################

@@ -1,7 +1,8 @@
 import pingrr.trakt as trakt
 import pingrr.sonarr as sonarr
-import pingrr.netflix as netflix
+#import pingrr.netflix as netflix
 import pingrr.config as config
+import pingrr.allflicks as allflicks
 
 import json
 import requests
@@ -176,7 +177,7 @@ def filter_check(arg):
 
 
 def filter_list():
-    raw_list = trakt.create_list() + netflix.create_list()
+    raw_list = trakt.create_list() + allflicks.create_list()
     filtered = []
     for title in raw_list:
         if filter_check(title):

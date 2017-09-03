@@ -2,6 +2,7 @@ import requests
 import logging
 import config
 import json
+import urllib
 
 ################################
 # Load config
@@ -18,8 +19,9 @@ with open(config_path) as json_data_file:
 ################################
 
 
-logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Trakt")
+logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s')
+
 
 ################################
 # Init
@@ -27,7 +29,9 @@ logger = logging.getLogger("Trakt")
 
 
 data = []
-headers = {'content-type': 'application/json', 'trakt-api-version': '2', 'trakt-api-key': conf['trakt']['api']}
+headers = {'content-type': 'application/json',
+           'trakt-api-version': '2',
+           'trakt-api-key': conf['trakt']['api']}
 popular = []
 anticipated = []
 trending = []
@@ -36,6 +40,32 @@ trending = []
 ################################
 # Main
 ################################
+
+
+def get_info_search(tv_id):
+    """Get info for a tv show"""
+    url = "https://api.trakt.tv/search/show?query=" + urllib.quote_plus(tv_id) + "&extended=full"
+    logger.debug('getting info from trakt for ' + tv_id)
+    r = requests.get(url=url, headers=headers, timeout=5.000)
+    if r.status_code == requests.codes.ok:
+        x = []
+        y = r.json()
+        y = y[0]['show']
+        x.append({'title': y['title'],
+                  'status': y['status'],
+                  'tvdb': y['ids']['tvdb'],
+                  'imdb': y['ids']['imdb'],
+                  'trakt': y['ids']['trakt'],
+                  'rating': y['rating'],
+                  'language': y['language'],
+                  'genres': y['genres'],
+                  'year': y['year']
+                  })
+        logger.debug('got tv show info successfully')
+        return x
+    else:
+        logger.debug('failed to get trakt show info, code return: ' + str(r.status_code))
+        return False
 
 
 def make_url(list_type):
