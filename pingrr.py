@@ -72,7 +72,7 @@ if conf['slack']['enabled']:
 
 def send_to_sonarr(a, b):
     """Send found tv program to sonarr"""
-    payload = {"tvdbId": a, "title": b, "qualityProfileId": sonarr.qprofile_lookup(), "seasons": [],
+    payload = {"tvdbId": a, "title": b, "qualityProfileId": conf['sonarr']['quality_profile'], "seasons": [],
                "seasonFolder": True, "rootFolderPath": conf['sonarr']['folder_path'], "addOptions": options,
                "images": []}
     r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=5.000)

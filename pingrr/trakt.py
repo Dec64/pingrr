@@ -1,8 +1,8 @@
 import requests
 import logging
-import config
 import json
 import urllib
+import config
 
 ################################
 # Load config

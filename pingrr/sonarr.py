@@ -39,12 +39,9 @@ def qprofile_lookup():
     """Check sonarr quality profile ID"""
     r = requests.get(url + '/api/profile', headers=headers, timeout=5.000)
     qprofile_id = r.json()
-    x = 0
-    for _ in qprofile_id:
-        if qprofile_id[x]['name'].lower() == conf['sonarr']['quality_profile'].lower():
-            return qprofile_id[x]['id']
-        else:
-            x += 1
+    for x in qprofile_id:
+        if x['name'].lower() == conf['sonarr']['quality_profile'].lower():
+            return x['id']
 
 
 def get_library():
