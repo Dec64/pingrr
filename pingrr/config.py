@@ -26,8 +26,6 @@ def get_quality_profiles(sonarr_url, key):
     wanted = ''
     while wanted is not int and len(data) < wanted:
         try:
-            if len(data) < wanted:
-                print "No profile with that ID, please choose again"
             wanted = int(raw_input("Which quality profile do you want to download shows with?: "))
         except ValueError:
             print "Please enter the ID of your profile you want"
