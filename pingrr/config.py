@@ -8,6 +8,13 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Config")
 
 
+def genre_list():
+    string_input = raw_input("Enter which genres you do NOT want to grab: \n")
+    string_input = string_input.lower()
+    created_list = string_input.split()
+    return created_list
+
+
 def conifg_load():
     if os.path.exists('config.json'):
         path = os.path.join(os.path.dirname(sys.argv[0]), 'config.json')
@@ -181,7 +188,7 @@ def create_config():
 
     filters_rating = raw_input("Enter the minimum rating a show must have to be added: \n")
     print '\033[94m' + str(filters_rating) + '\x1b[0m' + '\n'
-    # filters_genre = raw_input("Enter the minimum rating a show must have to be added: \n")
+    filters_genre = genre_list()
     filters_lang = raw_input("Enter the two letter language code for the language a show must be in(e.g. en): \n")
     print '\033[94m' + str(filters_lang) + '\x1b[0m' + '\n'
     filters_year = raw_input("What is the minimum year to grab a movie from? (Hit enter to get all): \n")
@@ -214,7 +221,8 @@ def create_config():
                   "sender_icon": ":robot_face:",
                   "channel": slack_channel},
         "filters": {"rating": int(filters_rating),
-                    "genre": [""], "language": filters_lang,
+                    "genre": filters_genre,
+                    "language": filters_lang,
                     "allow_ended": str2bool(filters_end),
                     "allow_canceled": str2bool(filters_cancel),
                     "year": int(filters_year)},

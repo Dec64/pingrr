@@ -57,6 +57,48 @@ Check it's all running fine by tailing the log
 
 `tail -f logs/pingrr.log`
 
+
+### Config
+
+There are a few config settings that are not set by the user on first run,
+if you fancy messing with more advanced settings you can open up the config.json
+file and change as needed.
+
+`"rating_match":94` <br />
+How close the match has to be out of 100 when parsing netflix titles.
+If you feel you are missing some titles feel free to play with this figure, but anything lower
+then 90 will most likely result in incorrect matches.
+
+`"log_level":"info"` <br />
+Set this to `debug` if you are having issues and want more output in the log/console.
+
+For the unwanted genres list, you need to type them as found on imdb, here are some examples:
+
+
+```
+comedy
+action
+drama
+fantasy
+science-fiction
+adventure
+reality
+superhero
+crime
+mystery
+horror
+thriller
+romance
+animation
+children
+home-and-garden
+anime
+family
+documentary
+game-show
+suspense
+```
+
 ### Todo
 
 1. Radarr support for netflix list
