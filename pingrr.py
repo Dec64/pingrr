@@ -158,7 +158,7 @@ def check_lists(arg, arg2):
 
 def filter_check(arg):
     title = arg
-    if conf['filters']['year'] < title[0]['year']
+    if conf['filters']['year'] > title[0]['year']:
         return False
     if conf['filters']['allow_ended'] is False and 'ended' in title[0]['status']:
         return False

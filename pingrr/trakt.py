@@ -116,8 +116,16 @@ def get_info(tv_id):
     if r.status_code == requests.codes.ok:
         x = []
         y = r.json()
-        x.append({'title': y['title'], 'status': y['status'], 'tvdb': y['ids']['tvdb'], 'imdb': y['ids']['imdb'],
-                  'trakt': y['ids']['trakt'], 'rating': y['rating'], 'language': y['language'], 'genres': y['genres']})
+        x.append({'title': y['title'],
+                  'status': y['status'],
+                  'tvdb': y['ids']['tvdb'],
+                  'imdb': y['ids']['imdb'],
+                  'trakt': y['ids']['trakt'],
+                  'rating': y['rating'],
+                  'language': y['language'],
+                  'genres': y['genres'],
+                  'year': y['year']
+                  })
         logger.debug('got tv show info successfully')
         return x
     else:
