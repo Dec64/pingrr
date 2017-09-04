@@ -1,7 +1,6 @@
 ![alt text](http://img.pixady.com/2017/09/143837_pingrr.png)<br />
 # pingrr.
 Python script that checks certain lists on [Trakt](http://trakt.tv) and [Netflix's](https://www.allflicks.net/) recently added shows, and if they meet your configured filters, adds them to your sonarr library.
-Sonarr Pusher will check the trakt.tv lists every 24 hours by default to keep sonarr constantly updated with new TV shows
 
 Currently supports:
 1. [Trakt Trending](https://trakt.tv/shows/trending)
