@@ -216,8 +216,8 @@ def create_config():
         "filters": {"rating": int(filters_rating),
                     "genre": [""], "language": filters_lang,
                     "allow_ended": str2bool(filters_end),
-                    "allow_canceled": str2bool(filters_cancel)},
-                    "year": int(filters_year)
+                    "allow_canceled": str2bool(filters_cancel),
+                    "year": int(filters_year)},
         "unogs": {"enabled": '',
                   "api": '',
                   "country": '',
