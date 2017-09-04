@@ -99,11 +99,48 @@ game-show
 suspense
 ```
 
+### Start on boot
+
+To have pingrr start on boot on ubuntu
+
+`cd /opt`
+
+`git clone https://github.com/Dec64/pingrr.git`
+
+run pingrr, and complete the config.
+
+`sudo nano /etc/systemd/system/pingrr.service`
+
+copy and paste the below, after editing `User=` and `Group=`
+
+```
+[Unit]
+Description=pingrr
+After=network-online.target
+
+[Service]
+User=YOUR_USER
+Group=YOUR_USER
+Type=simple
+WorkingDirectory=/opt/pingrr/
+ExecStart=/opt/pingrr/pingrr.py
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=default.target
+```
+
+Then enabled and start it with:
+
+`sudo systemctl enable pingrr.service`
+
+`sudo systemctl start pingrr`
+
 ### Todo
 
 1. Radarr support for netflix list
 2. More list sources if found
 3. Easier config generation
 4. Command line arguments.e.g <br />
-`python pingrr.py --conf /my/config/location/conf.json`<br />
-`python pingrr.py --quality_profile 720p`
+`python pingrr.py --conf /my/config/location/conf.json`
