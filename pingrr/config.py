@@ -164,23 +164,6 @@ def create_config():
         slack_webhook_url = ''
         slack_channel = ''
 
-    #print '\033[93m' + "\nIf you want to use the Netflix list to add recently added netflix shows you will\n" \
-    #                   "need to get a free unogs api from https://market.mashape.com/unogs/unogs first!\n" + '\x1b[0m'
-
-    #netflix_enabled = raw_input("Enable recently added Netflix list?(yes/no): \n")
-    #print "\n" * 100
-    #if str2bool(netflix_enabled):
-    #    netflix_api = raw_input("Enter your Unogs API key: \n")
-    #    print "\n" * 100
-    #    netflix_country = raw_input("Enter the Netflix country code you want to use(e.g. GB, US or ES): \n")
-    #    print "\n" * 100
-    #    netflix_days = raw_input("Enter how many days back to check: \n")
-    #    print "\n" * 100
-    #else:
-    #    netflix_api = ''
-    #    netflix_country = ''
-    #    netflix_days = ''
-
     print "\n"
     print "####################################\n" \
           "############ NETFLIX ###############\n" \
