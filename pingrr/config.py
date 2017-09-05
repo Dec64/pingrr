@@ -8,6 +8,16 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Config")
 
 
+def ask_year(low, high):
+    while True:
+        try:
+            number = int(raw_input("What is the minimum year to grab a tv show from? (0 for all ): \n"))
+        except ValueError:
+            continue
+        if low <= number <= high:
+            return number
+
+
 def genre_list():
     string_input = raw_input("Enter which genres you do NOT want to grab: \n")
     string_input = string_input.lower()
@@ -186,12 +196,13 @@ def create_config():
     print '\033[93m' + "\nIf you have selected more then one list, it is highly recommended that\n" \
                        "you add filters to avoid spamming Soanrr with rubbish content\n" + '\x1b[0m'
 
-    filters_rating = raw_input("Enter the minimum rating a show must have to be added: \n")
+    filters_rating = raw_input("Enter the minimum rating a show must have to be added (0-10): \n")
     print '\033[94m' + str(filters_rating) + '\x1b[0m' + '\n'
     filters_genre = genre_list()
+    print '\033[94m' + str(filters_genre) + '\x1b[0m' + '\n'
     filters_lang = raw_input("Enter the two letter language code for the language a show must be in(e.g. en): \n")
     print '\033[94m' + str(filters_lang) + '\x1b[0m' + '\n'
-    filters_year = raw_input("What is the minimum year to grab a movie from? (Hit enter to get all): \n")
+    filters_year = ask_year(0, 3000)
     print '\033[94m' + str(filters_year) + '\x1b[0m' + '\n'
     filters_end = raw_input("Do you want to add shows that have finished?(yes/no): \n")
     print '\033[94m' + str(str2bool(filters_end)) + '\x1b[0m' + '\n'
@@ -225,7 +236,7 @@ def create_config():
                     "language": filters_lang,
                     "allow_ended": str2bool(filters_end),
                     "allow_canceled": str2bool(filters_cancel),
-                    "year": int(filters_year)},
+                    "year": filters_year},
         "unogs": {"enabled": '',
                   "api": '',
                   "country": '',
