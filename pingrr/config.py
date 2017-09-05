@@ -189,6 +189,7 @@ def create_config():
     filters_rating = raw_input("Enter the minimum rating a show must have to be added: \n")
     print '\033[94m' + str(filters_rating) + '\x1b[0m' + '\n'
     filters_genre = genre_list()
+    print '\033[94m' + str(filters_genre) + '\x1b[0m' + '\n'
     filters_lang = raw_input("Enter the two letter language code for the language a show must be in(e.g. en): \n")
     print '\033[94m' + str(filters_lang) + '\x1b[0m' + '\n'
     filters_year = raw_input("What is the minimum year to grab a movie from? (0 for all ): \n")
