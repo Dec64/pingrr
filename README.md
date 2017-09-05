@@ -122,7 +122,7 @@ User=YOUR_USER
 Group=YOUR_USER
 Type=simple
 WorkingDirectory=/opt/pingrr/
-ExecStart=/opt/pingrr/pingrr.py
+ExecStart=/usr/bin/python /opt/pingrr/pingrr.py
 Restart=always
 RestartSec=10
 
