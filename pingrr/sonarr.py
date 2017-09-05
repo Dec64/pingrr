@@ -35,15 +35,6 @@ headers = {'X-Api-Key': conf['sonarr']['api']}
 ################################
 
 
-def qprofile_lookup():
-    """Check sonarr quality profile ID"""
-    r = requests.get(url + '/api/profile', headers=headers, timeout=5.000)
-    qprofile_id = r.json()
-    for x in qprofile_id:
-        if x['name'].lower() == conf['sonarr']['quality_profile'].lower():
-            return x['id']
-
-
 def get_library():
     """Get sonarr library in a list of tvdbid ids"""
     library = []

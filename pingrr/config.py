@@ -8,6 +8,16 @@ logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Config")
 
 
+def ask_year(low, high):
+    while True:
+        try:
+            number = int(raw_input("What is the minimum year to grab a movie from? (0 for all ): \n"))
+        except ValueError:
+            continue
+        if low <= number <= high:
+            return number
+
+
 def genre_list():
     string_input = raw_input("Enter which genres you do NOT want to grab: \n")
     string_input = string_input.lower()
@@ -192,9 +202,7 @@ def create_config():
     print '\033[94m' + str(filters_genre) + '\x1b[0m' + '\n'
     filters_lang = raw_input("Enter the two letter language code for the language a show must be in(e.g. en): \n")
     print '\033[94m' + str(filters_lang) + '\x1b[0m' + '\n'
-    filters_year = raw_input("What is the minimum year to grab a movie from? (0 for all ): \n")
-    while filters_year is not int:
-        filters_year = raw_input("Please enter an number only \n What is the minimum year to grab a movie from? (0 for all ): \n")
+    filters_year = ask_year(0, 3000)
     print '\033[94m' + str(filters_year) + '\x1b[0m' + '\n'
     filters_end = raw_input("Do you want to add shows that have finished?(yes/no): \n")
     print '\033[94m' + str(str2bool(filters_end)) + '\x1b[0m' + '\n'
