@@ -57,6 +57,16 @@ Check it's all running fine by tailing the log
 
 `tail -f logs/pingrr.log`
 
+### Command line arguments
+
+If you want to define a config location for pingrr (running multiple
+instances with different categories/folder locations/lists) you can define
+the config location via command line, either using `-c` or `--conf=`. E.g.
+
+`python pingrr.py --conf=/my/config/location/conf.json`
+<br /><br />
+`python pingrr.py -c /my/config/location/conf.json`
+
 
 ### Config
 
@@ -137,10 +147,16 @@ Then enabled and start it with:
 
 `sudo systemctl start pingrr`
 
+***
+
+If you are have set pingrr to not loop (setting the timer to 0) then you
+must remove
+```Restart=always RestartSec=10```
+ <br />
+from systemd file, otherwise it will restart every 10seconds.
+
 ### Todo
 
 1. Radarr support for netflix list
 2. More list sources if found
 3. Easier config generation
-4. Command line arguments.e.g <br />
-`python pingrr.py --conf /my/config/location/conf.json`

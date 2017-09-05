@@ -3,9 +3,59 @@ import logging
 import sys
 import os
 import requests
+import getopt
+
+################################
+# Load config
+################################
+
+
+def usage():
+    print "--help or -h list possible command line parameters"
+    print "--conf= or -c 'path to your json config file'"
+    print "-d run pingrr in debug mode"
+
+
+def config_cmd_line(argv):
+    try:
+        opts, args = getopt.getopt(argv, "hc:d", ["help", "conf="])
+    except getopt.GetoptError as err:
+        print str(err)
+        usage()
+        sys.exit(2)
+    for opt, arg in opts:
+        if opt in ("-c", "--conf"):
+            location = arg.lstrip()
+            return location
+    return False
+
+
+def config_location():
+    location = config_cmd_line(sys.argv[1:])
+    if location:
+        if os.path.exists(location):
+            return location
+        else:
+            create_config(location)
+    else:
+        if os.path.exists('config.json'):
+            return 'config.json'
+        else:
+            create_config('config.json')
+
+
+################################
+# Logging
+################################
+
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("Config")
+
+
+################################
+# Main
+################################
 
 
 def ask_year(low, high):
@@ -18,16 +68,30 @@ def ask_year(low, high):
             return number
 
 
+def ask_rating():
+    while True:
+        try:
+            number = int(raw_input("Enter the minimum rating a show must have to be added (0-10) \n"))
+        except ValueError:
+            continue
+        if 0 <= number <= 10:
+            return number
+
+
 def genre_list():
-    string_input = raw_input("Enter which genres you do NOT want to grab: \n")
+    string_input = raw_input("Enter which genres you do NOT want to grab(Enter to skip/allow all): \n")
     string_input = string_input.lower()
     created_list = string_input.split()
     return created_list
 
 
-def conifg_load():
-    if os.path.exists('config.json'):
-        path = os.path.join(os.path.dirname(sys.argv[0]), 'config.json')
+def conifg_load(arg_location):
+    if arg_location:
+        path = arg_location
+    else:
+        path = 'config.json'
+    if os.path.exists(str(path)):
+        path = os.path.join(os.path.dirname(sys.argv[0]), str(path))
         return path
     else:
         create_config()
@@ -43,7 +107,7 @@ def get_quality_profiles(sonarr_url, key):
     wanted = ''
     while wanted is not int and len(data) < wanted:
         try:
-            wanted = int(raw_input("Which quality profile do you want to download shows with?: "))
+            wanted = int(raw_input("Which quality profile do you want to download shows with?: \n"))
         except ValueError:
             print "Please enter the ID of your profile you want"
             continue
@@ -75,7 +139,7 @@ def str2bool(v):
     return str(v).lower() in ("yes", "true", "t", "1", "y")
 
 
-def create_config():
+def create_config(arg_loc):
     print '\033[93m' + "\nPingrr has no config, please follow the instructions to create one\n" + '\x1b[0m'
 
     print "\n"
@@ -179,7 +243,7 @@ def create_config():
     print '\033[93m' + "\nIf you have selected more then one list, it is highly recommended that\n" \
                        "you add filters to avoid spamming Soanrr with rubbish content\n" + '\x1b[0m'
 
-    filters_rating = raw_input("Enter the minimum rating a show must have to be added (0-10): \n")
+    filters_rating = ask_rating()
     print '\033[94m' + str(filters_rating) + '\x1b[0m' + '\n'
     filters_genre = genre_list()
     print '\033[94m' + str(filters_genre) + '\x1b[0m' + '\n'
@@ -228,8 +292,12 @@ def create_config():
                       "rating_match": 94}
     }
 
-    with open('config.json', 'w') as outfile:
+    with open(arg_loc, 'w') as outfile:
         json.dump(fresh_config, outfile, indent=4, sort_keys=True)
 
     logger.info('config file created, please check config and re-run Pingrr')
     sys.exit()
+
+
+with open(config_location()) as json_data_file:
+    conf = json.load(json_data_file)

@@ -10,9 +10,9 @@ import trakt
 ################################
 
 
-config_path = config.conifg_load()
-with open(config_path) as json_data_file:
+with open(config.config_location()) as json_data_file:
     conf = json.load(json_data_file)
+
 
 ################################
 # Logging
