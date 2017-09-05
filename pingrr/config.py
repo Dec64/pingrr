@@ -191,7 +191,9 @@ def create_config():
     filters_genre = genre_list()
     filters_lang = raw_input("Enter the two letter language code for the language a show must be in(e.g. en): \n")
     print '\033[94m' + str(filters_lang) + '\x1b[0m' + '\n'
-    filters_year = raw_input("What is the minimum year to grab a movie from? (Hit enter to get all): \n")
+    filters_year = raw_input("What is the minimum year to grab a movie from? (0 for all ): \n")
+    while filters_year is not int:
+        filters_year = raw_input("Please enter an number only \n What is the minimum year to grab a movie from? (0 for all ): \n")
     print '\033[94m' + str(filters_year) + '\x1b[0m' + '\n'
     filters_end = raw_input("Do you want to add shows that have finished?(yes/no): \n")
     print '\033[94m' + str(str2bool(filters_end)) + '\x1b[0m' + '\n'
@@ -225,7 +227,7 @@ def create_config():
                     "language": filters_lang,
                     "allow_ended": str2bool(filters_end),
                     "allow_canceled": str2bool(filters_cancel),
-                    "year": int(filters_year)},
+                    "year": filters_year},
         "unogs": {"enabled": '',
                   "api": '',
                   "country": '',
