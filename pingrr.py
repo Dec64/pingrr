@@ -1,7 +1,6 @@
+import pingrr.config as config
 import pingrr.trakt as trakt
 import pingrr.sonarr as sonarr
-#import pingrr.netflix as netflix
-import pingrr.config as config
 import pingrr.allflicks as allflicks
 from pingrr.notifications import Notifications
 
@@ -20,9 +19,9 @@ from logging.handlers import RotatingFileHandler
 ################################
 
 
-config_path = config.conifg_load()
-with open(config_path) as json_data_file:
+with open(config.config_location()) as json_data_file:
     conf = json.load(json_data_file)
+
 
 ################################
 # Logging
@@ -113,11 +112,13 @@ def add_shows():
                 logger.warning('error sending show: ' + title + ' tvdbid: ' + str(tvdb_id))
     if conf['pushover']['enabled'] or conf['slack']['enabled'] and n != 0:
         if n > 1:
-            text = (str(n), "TV Shows", "have", str(len(new_shows)))
+            text = (str(n), "TV Shows", str(len(new_shows), "have"))
         else:
             text = (str(n), "TV Show", str(len(new_shows)), "has")
         message = "The following %s %s out of %s %s been added to Sonarr: " % text + "\n" + '\n'.join(added_list)
         notify.send(message=message)
+    if conf['pingrr']['timer'] != 0:
+        sleep_timer()
 
 
 def new_check():
@@ -137,12 +138,7 @@ def new_check():
             add_shows()
             break
     if conf['pingrr']['timer'] != 0:
-        logger.info('no new shows to add, checking again in ' + str(conf['pingrr']['timer']) + ' hour(s)')
-        logger.debug('sleeping for ' + str(delay_time) + ' seconds')
-        sleep(float(delay_time))
-        logger.debug('sleep over, checking again')
-        add_shows()
-        return True
+        sleep_timer()
     else:
         logger.info('nothing left to add, shutting down')
         sys.exit()
@@ -188,6 +184,14 @@ def filter_list():
             filtered.append(title[0])
     logger.debug(filtered)
     return filtered
+
+
+def sleep_timer():
+    logger.info('no new shows to add, checking again in ' + str(conf['pingrr']['timer']) + ' hour(s)')
+    logger.debug('sleeping for ' + str(delay_time) + ' seconds')
+    sleep(float(delay_time))
+    logger.debug('sleep over, checking again')
+    new_check()
 
 
 if __name__ == "__main__":
