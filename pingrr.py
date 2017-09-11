@@ -115,7 +115,7 @@ def add_shows():
         if n > 1:
             text = (str(n), "TV Shows", "have", str(len(new_shows)))
         else:
-            text = (str(n), "TV Show", str(len(new_shows)), "has")
+            text = (str(n), "TV Show",  "has", str(len(new_shows)))
         message = "The following %s %s out of %s %s been added to Sonarr: " % text + "\n" + '\n'.join(added_list)
         notify.send(message=message)
 
