@@ -190,7 +190,7 @@ def filter_list():
         if filter_check(title):
             logger.debug(title[0]['title'] + ' meets filter requirements, adding to list to check with sonarr')
             filtered.append(title[0])
-    logger.debug(filtered)
+    #logger.debug(filtered)
     return filtered
 
 
@@ -199,7 +199,7 @@ def remove_dupes(dupe_list):
     for show in dupe_list:
         if show not in deduped:
             deduped.append(show)
-    logger.debug(deduped)
+    #logger.debug(deduped)
     return deduped
 
 
