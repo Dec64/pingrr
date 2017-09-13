@@ -112,7 +112,7 @@ def add_shows():
                 logger.warning('error sending show: ' + title + ' tvdbid: ' + str(tvdb_id))
     if conf['pushover']['enabled'] or conf['slack']['enabled'] and n != 0:
         if n > 1:
-            text = (str(n), "TV Shows", str(len(new_shows), "have"))
+            text = (str(n), "TV Show", "have", str(len(new_shows)))
         else:
             text = (str(n), "TV Show",  "has", str(len(new_shows)))
         message = "The following %s %s out of %s %s been added to Sonarr: " % text + "\n" + '\n'.join(added_list)
