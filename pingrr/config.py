@@ -255,6 +255,11 @@ def create_config(arg_loc):
     print '\033[94m' + str(str2bool(filters_end)) + '\x1b[0m' + '\n'
     filters_cancel = raw_input("Do you want to add shows that have been cancelled?(yes/no): \n")
     print '\033[94m' + str(str2bool(filters_cancel)) + '\x1b[0m' + '\n'
+    filters_runtime = raw_input("What is the minimum runtime for a show to be grabbed?: \n")
+    print '\033[94m' + filters_runtime + '\x1b[0m' + '\n'
+    filters_votes = raw_input("What is the minimum number of votes for a show to be grabbed?: \n")
+    print '\033[94m' + filters_votes + '\x1b[0m' + '\n'
+
 
     fresh_config = {
         "sonarr": {"host": sonarr_host,
@@ -283,6 +288,10 @@ def create_config(arg_loc):
                     "language": filters_lang,
                     "allow_ended": str2bool(filters_end),
                     "allow_canceled": str2bool(filters_cancel),
+                    "runtime": int(filters_runtime),
+                    "votes": int(filters_votes),
+                    "network": "",
+                    "country": "",
                     "year": filters_year},
         "unogs": {"enabled": '',
                   "api": '',

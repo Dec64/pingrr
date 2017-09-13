@@ -154,7 +154,15 @@ def check_lists(arg, arg2):
 
 def filter_check(arg):
     title = arg
+    country = title[0]['country']
+    lang = title[0]['language']
     if conf['filters']['year'] > title[0]['year']:
+        return False
+    if conf['filters']['runtime'] > title[0]['runtime']:
+        return False
+    if title[0]['network'] == None or conf['filters']['network'] in title[0]['network']:
+        return False
+    if conf['filters']['votes'] > title[0]['votes']:
         return False
     if conf['filters']['allow_ended'] is False and 'ended' in title[0]['status']:
         return False
@@ -167,23 +175,32 @@ def filter_check(arg):
             return False
     elif conf['filters']['genre'] == title[0]['genres']:
         return False
-    if isinstance(conf['filters']['language'], list):
-        if check_lists('language', title[0]['language']):
-            return True
-    elif conf['filters']['language'] == title[0]['language']:
-        return True
+    if  country not in conf['filters']['country']:
+        return False
+    if  lang not in conf['filters']['language']:
+        return False
     return True
 
 
 def filter_list():
     raw_list = trakt.create_list() + allflicks.create_list()
+    raw_list = remove_dupes(raw_list)
     filtered = []
     for title in raw_list:
         if filter_check(title):
-            logger.debug('adding ' + title[0]['title'] + ' to the list to check with sonarr')
+            logger.debug(title[0]['title'] + ' meets filter requirements, adding to list to check with sonarr')
             filtered.append(title[0])
     logger.debug(filtered)
     return filtered
+
+
+def remove_dupes(dupe_list):
+    deduped = []
+    for show in dupe_list:
+        if show not in deduped:
+            deduped.append(show)
+    logger.debug(deduped)
+    return deduped
 
 
 def sleep_timer():

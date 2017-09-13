@@ -57,7 +57,11 @@ def get_info_search(tv_id):
                   'trakt': y['ids']['trakt'],
                   'rating': y['rating'],
                   'language': y['language'],
+                  'country': y['country'],
                   'genres': y['genres'],
+                  'network': y['network'],
+                  'votes': y['votes'],
+                  'runtime': y['runtime'],
                   'year': y['year']
                   })
         logger.debug('got tv show info successfully')
@@ -122,7 +126,11 @@ def get_info(tv_id):
                   'trakt': y['ids']['trakt'],
                   'rating': y['rating'],
                   'language': y['language'],
+                  'country': y['country'],
                   'genres': y['genres'],
+                  'network': y['network'],
+                  'votes': y['votes'],
+                  'runtime': y['runtime'],
                   'year': y['year']
                   })
         logger.debug('got tv show info successfully')
