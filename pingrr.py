@@ -204,7 +204,7 @@ def filter_list():
                 filtered.append(title[0])
         except TypeError:
             logger.debug(title[0]['title'] + ' failed to check against filters')
-    logger.debug(filtered)
+    logger.debug("Filtered list successfully")
     return filtered
 
 

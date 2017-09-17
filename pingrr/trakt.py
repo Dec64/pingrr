@@ -153,7 +153,6 @@ def create_list():
             x.append(get_info(item['ids']['imdb']))
             logger.debug('adding ' + item['title'] + ' from popular')
     if conf['trakt']['list']['trending']:
-        logger.info(item['ids']['imdb'])
         for item in get_trakt_trending():
             if item['show']['ids']['imdb'] not in x:
                 x.append(get_info(item['show']['ids']['imdb']))

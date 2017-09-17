@@ -200,17 +200,19 @@ def create_list():
                         if title1 == title2:
                             y.append(x)
                             logger.debug("match found for: " + x[0]['title'] + " / " + tv['title'])
+                            continue
                         if format_string(title1) == format_string(title2):
                             y.append(x)
                             logger.debug("match found for: " + x[0]['title'] + " / " + tv['title'])
+                            continue
                         elif x[0]['year'] == tv['year']:
                             average += 10
                             if average >= conf['allflicks']['rating_match']:
                                 y.append(x)
                                 logger.debug("match found for: " + x[0]['title'] + " / " + tv['title'])
+                                continue
                         else:
                             logger.debug("no match found for: " + x[0]['title'] + " / " + tv['title'])
-
                     except:
                         logger.debug("no match on trakt for title: " + tv['title'])
             logger.info('Allflicks list created, ' + str(len(y)) + ' shows found')
