@@ -56,6 +56,8 @@ elif conf['pingrr']['log_level'].lower() == 'debug':
     logger.setLevel(logging.DEBUG)
     consoleHandler.setLevel(logging.DEBUG)
 
+logging.getLogger("requests").setLevel(logging.WARNING)
+
 ################################
 # Init
 ################################

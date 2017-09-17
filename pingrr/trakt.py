@@ -3,6 +3,7 @@ import logging
 import json
 import urllib
 import config
+import time
 
 ################################
 # Load config
@@ -72,8 +73,11 @@ def get_info_search(tv_id):
 
 def make_url(list_type):
     """Generate the url for trakt api with filters as needed"""
-    url = "https://api.trakt.tv" + "/shows/" + list_type + "/?limit=" + str(conf['trakt']['limit'])
-    logger.debug('created trakt url for: ', list_type)
+    if list_type ==  'trending':
+        url = "https://api.trakt.tv" + "/shows/" + list_type + "/?limit=100"
+    else:
+        url = "https://api.trakt.tv" + "/shows/" + list_type + "/?limit=" + str(conf['trakt']['limit'])
+    logger.debug('created trakt url for: ' + list_type)
     return url
 
 
@@ -101,20 +105,22 @@ def get_trakt_anticipated():
 
 def get_trakt_trending():
     """Get trakt anticipated list info"""
-    r = requests.get(url=make_url('trending'), headers=headers)
-    if r.status_code == requests.codes.ok:
-        logger.debug('got trakt trending list successfully')
-        return r.json()
-    else:
-        logger.debug('failed to get trakt trending list, code return: ' + str(r.status_code))
-        return False
+    while True:
+        r = requests.get(url=make_url('trending'), headers=headers)
+        if r.status_code == 200:
+            logger.debug('got trakt trending list successfully')
+            return r.json()
+        else:
+            logger.debug('failed to get trakt trending list, code return: ' + str(r.status_code))
+            logger.debug('trying again in 5 seconds')
+            time.sleep(5)
 
 
 def get_info(tv_id):
     """Get info for a tv show"""
     url = "https://api.trakt.tv/shows/" + tv_id + "?extended=full"
-    logger.debug('getting info from trakt for ', tv_id)
-    r = requests.get(url=url, headers=headers, timeout=5.000)
+    logger.debug('getting info from trakt for ' + tv_id)
+    r = requests.get(url=url, headers=headers)
     if r.status_code == requests.codes.ok:
         x = []
         y = r.json()
@@ -143,19 +149,20 @@ def create_list():
     x = []
     logger.info('creating list from trakt.tv')
     if conf['trakt']['list']['popular']:
-        for item in get_trakt_anticipated():
-            x.append(get_info(item['show']['ids']['imdb']))
-            logger.debug('adding ', item['show']['title'], ' from popular')
-    if conf['trakt']['list']['popular']:
+        for item in get_trakt_popular():
+            x.append(get_info(item['ids']['imdb']))
+            logger.debug('adding ' + item['title'] + ' from popular')
+    if conf['trakt']['list']['trending']:
+        logger.info(item['ids']['imdb'])
         for item in get_trakt_trending():
             if item['show']['ids']['imdb'] not in x:
                 x.append(get_info(item['show']['ids']['imdb']))
-                logger.debug('adding ', item['show']['title'], ' from trending')
-    if conf['trakt']['list']['trending']:
+                logger.debug('adding ' + item['show']['title'] + ' from trending')
+    if conf['trakt']['list']['anticipated']:
         for item in get_trakt_anticipated():
             if item['show']['ids']['imdb'] not in x:
                 x.append(get_info(item['show']['ids']['imdb']))
-                logger.debug('adding ', item['show']['title'], ' from anticipated')
+                logger.debug('adding ' + item['show']['title'] + ' from anticipated')
     else:
         logger.info('no trakt lists wanted, skipping')
         pass
