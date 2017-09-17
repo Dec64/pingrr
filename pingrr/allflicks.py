@@ -21,8 +21,8 @@ with open(config.config_location()) as json_data_file:
 # Logging
 ################################
 
-logger = logging.getLogger("Allflicks")
-logging.basicConfig(level=logging.DEBUG)
+
+logger = logging.getLogger(__name__)
 
 
 ################################

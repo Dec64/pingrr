@@ -18,8 +18,7 @@ with open(config.config_location()) as json_data_file:
 ################################
 
 
-logger = logging.getLogger("Trakt")
-logging.basicConfig(format='%(asctime)s - %(levelname)s: %(message)s')
+logger = logging.getLogger(__name__)
 
 
 ################################

@@ -1,8 +1,7 @@
 import logging
 import requests
 
-logging.getLogger("requests").setLevel(logging.WARNING)
-logger = logging.getLogger("Pushover")
+logger = logging.getLogger(__name__)
 
 
 class Pushover:

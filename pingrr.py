@@ -31,13 +31,23 @@ with open(config.config_location()) as json_data_file:
 if not os.path.exists('logs'):
     os.makedirs('logs')
 
+
+logger = logging.getLogger()
+consoleHandler = logging.StreamHandler()
+formatter = logging.Formatter(
+        '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+
 log_path = os.path.join(os.path.dirname(sys.argv[0]), 'logs/pingrr.log')
-logging.basicConfig(stream=sys.stdout, format='%(asctime)s - %(levelname)s: %(message)s')
-logger = logging.getLogger("Pingrr")
+
+consoleHandler.setFormatter(formatter)
+logger.addHandler(consoleHandler)
 
 consoleHandler = logging.StreamHandler()
-handler = RotatingFileHandler(log_path, maxBytes=1024 * 1024 * 2, backupCount=1)
-logger.addHandler(handler)
+Handler = RotatingFileHandler(log_path,
+                                     maxBytes=1024 * 1024 * 2,
+                                     backupCount=1)
+Handler.setFormatter(formatter)
+logger.addHandler(Handler)
 
 if conf['pingrr']['log_level'].lower() == 'info':
     logger.setLevel(logging.INFO)
@@ -175,9 +185,9 @@ def filter_check(arg):
             return False
     elif conf['filters']['genre'] == title[0]['genres']:
         return False
-    if  country not in conf['filters']['country']:
+    if country not in conf['filters']['country']:
         return False
-    if  lang not in conf['filters']['language']:
+    if lang not in conf['filters']['language']:
         return False
     return True
 
@@ -201,7 +211,6 @@ def remove_dupes(dupe_list):
     for show in dupe_list:
         if show not in deduped:
             deduped.append(show)
-    #logger.debug(deduped)
     return deduped
 
 

@@ -49,8 +49,7 @@ def config_location():
 ################################
 
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger("Config")
+logger = logging.getLogger(__name__)
 
 
 ################################
