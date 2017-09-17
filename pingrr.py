@@ -172,7 +172,7 @@ def filter_check(arg):
         return False
     if conf['filters']['runtime'] > title[0]['runtime']:
         return False
-    if title[0]['network'] == None or conf['filters']['network'] in title[0]['network']:
+    if title[0]['network'] is None or conf['filters']['network'] in title[0]['network']:
         return False
     if conf['filters']['votes'] > title[0]['votes']:
         return False
