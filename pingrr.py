@@ -184,13 +184,15 @@ def filter_check(arg):
 
 def filter_list():
     raw_list = trakt.create_list() + allflicks.create_list()
-    raw_list = remove_dupes(raw_list)
     filtered = []
     for title in raw_list:
-        if filter_check(title):
-            logger.debug(title[0]['title'] + ' meets filter requirements, adding to list to check with sonarr')
-            filtered.append(title[0])
-    #logger.debug(filtered)
+        try:
+            if filter_check(title):
+                logger.debug('adding ' + title[0]['title'] + ' to the list to check with sonarr')
+                filtered.append(title[0])
+        except TypeError:
+            logger.debug(title[0]['title'] + ' failed to check against filters')
+    logger.debug(filtered)
     return filtered
 
 
