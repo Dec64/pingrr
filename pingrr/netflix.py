@@ -1,7 +1,6 @@
-import json
-import requests
 import logging
 import config
+import requests
 
 import trakt
 
@@ -9,33 +8,26 @@ import trakt
 # Load config
 ################################
 
-
-with open(config.config_location()) as json_data_file:
-    conf = json.load(json_data_file)
-
+conf = config.Config().config
 
 ################################
 # Logging
 ################################
 
-
 logger = logging.getLogger("Netflix")
-logging.basicConfig(level=logging.INFO)
-
 
 ################################
 # Init
 ################################
 
-
 url = "https://unogs-unogs-v1.p.mashape.com/aaapi.cgi?q=get:new" + conf['unogs']['days'] + ":" + conf['unogs'][
     'country'] + "&p=1&t=ns&st=adv"
 headers = {"X-Mashape-Key": conf['unogs']['api'], "Accept": "application/json"}
 
-
 ################################
 # Main
 ################################
+
 
 def get_list():
     """get list of recently added netflix items"""
@@ -65,7 +57,7 @@ def create_list():
                     else:
                         x.append(info)
                         logger.debug('Show: ', item['title'], ' added to netflix list')
-                except:
+                except Exception:
                     logger.warning('can not read netflix data, error creating list')
         logger.info('Netflix list created, ' + str(len(x)) + ' shows found')
         return x

@@ -1,39 +1,33 @@
 import logging
+import config
 import requests
 import re
-import config
-import json
 import trakt
+import urllib
 from bs4 import BeautifulSoup
 from fuzzywuzzy import fuzz
-
 
 ################################
 # Load config
 ################################
 
-
-with open(config.config_location()) as json_data_file:
-    conf = json.load(json_data_file)
-
+conf = config.Config().config
 
 ################################
 # Logging
 ################################
 
-
 logger = logging.getLogger(__name__)
-
 
 ################################
 # Init
 ################################
 
-
-headers = {'content-type': 'application/json',
-           'trakt-api-version': '2',
-           'trakt-api-key': conf['trakt']['api']}
-
+headers = {
+    'content-type': 'application/json',
+    'trakt-api-version': '2',
+    'trakt-api-key': conf['trakt']['api']
+}
 
 ################################
 # get cookie info
@@ -213,7 +207,7 @@ def create_list():
                                 continue
                         else:
                             logger.debug("no match found for: " + x[0]['title'] + " / " + tv['title'])
-                    except:
+                    except Exception:
                         logger.debug("no match on trakt for title: " + tv['title'])
             logger.info('Allflicks list created, ' + str(len(y)) + ' shows found')
             return y

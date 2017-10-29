@@ -1,67 +1,64 @@
 import pingrr.config as config
-import pingrr.trakt as trakt
-import pingrr.sonarr as sonarr
-import pingrr.allflicks as allflicks
-from pingrr.notifications import Notifications
 
 import json
 import logging
+from logging.handlers import RotatingFileHandler
 import sys
-import os
 
 from requests import post
 from time import sleep
-from logging.handlers import RotatingFileHandler
-
-
-################################
-# Load config
-################################
-
-
-with open(config.config_location()) as json_data_file:
-    conf = json.load(json_data_file)
-
 
 ################################
 # Logging
 ################################
 
+# Logging format
+formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
 
-if not os.path.exists('logs'):
-    os.makedirs('logs')
-
-
+# root logger
 logger = logging.getLogger()
+# Set initial level to INFO
+logger.setLevel(logging.INFO)
+
+# Console handler
 consoleHandler = logging.StreamHandler()
-formatter = logging.Formatter(
-        '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
-
-log_path = os.path.join(os.path.dirname(sys.argv[0]), 'logs/pingrr.log')
-
 consoleHandler.setFormatter(formatter)
 logger.addHandler(consoleHandler)
 
-consoleHandler = logging.StreamHandler()
-Handler = RotatingFileHandler(log_path,
-                                     maxBytes=1024 * 1024 * 2,
-                                     backupCount=1)
-Handler.setFormatter(formatter)
-logger.addHandler(Handler)
-
-if conf['pingrr']['log_level'].lower() == 'info':
-    logger.setLevel(logging.INFO)
-    consoleHandler.setLevel(logging.INFO)
-elif conf['pingrr']['log_level'].lower() == 'debug':
-    logger.setLevel(logging.DEBUG)
-    consoleHandler.setLevel(logging.DEBUG)
-
+# Other modules logging levels
 logging.getLogger("requests").setLevel(logging.WARNING)
+
+################################
+# Load config
+################################
+
+# Load initial config
+configuration = config.Config()
+
+# Set configured log level
+logger.setLevel(configuration.settings['loglevel'])
+
+# Load config file
+configuration.load()
+conf = configuration.config
+
+# Log file handler
+fileHandler = RotatingFileHandler(
+    configuration.settings['logfile'],
+    maxBytes=1024 * 1024 * 2,
+    backupCount=1
+)
+fileHandler.setFormatter(formatter)
+logger.addHandler(fileHandler)
 
 ################################
 # Init
 ################################
 
+import pingrr.trakt as trakt
+import pingrr.sonarr as sonarr
+import pingrr.allflicks as allflicks
+from pingrr.notifications import Notifications
 
 sent = None
 new_shows = []
@@ -75,7 +72,6 @@ if conf['pushover']['enabled']:
 if conf['slack']['enabled']:
     notify.load(service="slack", webhook_url=conf['slack']['webhook_url'], sender_name=conf['slack']['sender_name'],
                 sender_icon=conf['slack']['sender_icon'], channel=conf['slack']['channel'])
-
 
 ################################
 # Main
@@ -120,13 +116,13 @@ def add_shows():
                         logger.debug('limit not yet reached: ' + str(n))
                 else:
                     logger.warning(title + ' failed to be added to Sonarr!')
-            except:
+            except Exception:
                 logger.warning('error sending show: ' + title + ' tvdbid: ' + str(tvdb_id))
     if conf['pushover']['enabled'] or conf['slack']['enabled'] and n != 0:
         if n > 1:
             text = (str(n), "TV Show", "have", str(len(new_shows)))
         else:
-            text = (str(n), "TV Show",  "has", str(len(new_shows)))
+            text = (str(n), "TV Show", "has", str(len(new_shows)))
         message = "The following %s %s out of %s %s been added to Sonarr: " % text + "\n" + '\n'.join(added_list)
         notify.send(message=message)
     if conf['pingrr']['timer'] != 0:
