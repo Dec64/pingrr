@@ -20,8 +20,8 @@ logger = logging.getLogger()
 # Set initial level to INFO
 logger.setLevel(logging.INFO)
 
-# Console handler
-consoleHandler = logging.StreamHandler()
+# Console handler, log to stdout
+consoleHandler = logging.StreamHandler(sys.stdout)
 consoleHandler.setFormatter(formatter)
 logger.addHandler(consoleHandler)
 
