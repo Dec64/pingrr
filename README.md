@@ -23,17 +23,13 @@ You will need a Trakt account and an api key (client ID),
 you can create a new API app in trakt [here](https://trakt.tv/oauth/applications/new)
 
 1. Python 2.7
-2. requests 2.18.4
-3. BeautifulSoup 3.2.1
-4. fuzzywuzzy 0.15.1
+2. requests
+3. BeautifulSoup
+4. fuzzywuzzy
 
-`
-sudo apt-get install python
-`
+`sudo apt-get install python`
 
-`
-pip install -r requirements.txt
-`
+`pip install -r requirements.txt`
 
 ### Installing
 
@@ -56,15 +52,26 @@ Check it's all running fine by tailing the log
 
 `tail -f logs/pingrr.log`
 
+
 ### Command line arguments
 
 If you want to define a config location for pingrr (running multiple
 instances with different categories/folder locations/lists) you can define
-the config location via command line, either using `-c` or `--conf=`. E.g.
+the config location via:
 
-`python pingrr.py --conf=/my/config/location/conf.json`
-<br /><br />
-`python pingrr.py -c /my/config/location/conf.json`
+- Command line by using `-c` or `--config=`:
+  - `python pingrr.py -c /my/config/location/conf.json`
+  - `python pingrr.py --config=/my/config/location/conf.json`
+
+
+- Environment variable by setting `PINGRR_CONFIG`:
+  - `PINGRR_CONFIG=/my/config/location/conf.json python pingrr.py`
+
+Logging level can be increased if you are having issues and want more output in the log/console by using `--loglevel`:
+- `python pingrr.py --loglevel=DEBUG`
+
+To list all possible arguments and options run:
+- `python pingrr.py -h`
 
 
 ### Config
@@ -78,11 +85,7 @@ How close the match has to be out of 100 when parsing netflix titles.
 If you feel you are missing some titles feel free to play with this figure, but anything lower
 then 90 will most likely result in incorrect matches.
 
-`"log_level":"info"` <br />
-Set this to `debug` if you are having issues and want more output in the log/console.
-
 For the unwanted genres list, you need to type them as found on imdb, here are some examples:
-
 
 ```
 comedy
@@ -149,10 +152,7 @@ Then enabled and start it with:
 ***
 
 If you are have set pingrr to not loop (setting the timer to 0) then you
-must remove
-```Restart=always RestartSec=10```
- <br />
-from systemd file, otherwise it will restart every 10seconds.
+must remove `Restart=always RestartSec=10` from systemd file, otherwise it will restart every 10seconds.
 
 ### Todo
 

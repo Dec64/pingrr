@@ -1,40 +1,34 @@
-import requests
 import logging
-import json
-import urllib
 import config
 import time
+import requests
+import urllib
 
 ################################
 # Load config
 ################################
 
-
-with open(config.config_location()) as json_data_file:
-    conf = json.load(json_data_file)
-
+conf = config.Config().config
 
 ################################
 # Logging
 ################################
 
-
 logger = logging.getLogger(__name__)
-
 
 ################################
 # Init
 ################################
 
-
 data = []
-headers = {'content-type': 'application/json',
-           'trakt-api-version': '2',
-           'trakt-api-key': conf['trakt']['api']}
+headers = {
+    'content-type': 'application/json',
+    'trakt-api-version': '2',
+    'trakt-api-key': conf['trakt']['api']
+}
 popular = []
 anticipated = []
 trending = []
-
 
 ################################
 # Main
@@ -73,7 +67,7 @@ def get_info_search(tv_id):
 
 def make_url(list_type):
     """Generate the url for trakt api with filters as needed"""
-    if list_type ==  'trending':
+    if list_type == 'trending':
         url = "https://api.trakt.tv" + "/shows/" + list_type + "/?limit=100"
     else:
         url = "https://api.trakt.tv" + "/shows/" + list_type + "/?limit=" + str(conf['trakt']['limit'])

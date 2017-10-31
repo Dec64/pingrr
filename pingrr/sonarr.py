@@ -1,25 +1,19 @@
-import json
-import requests
 import logging
 import config
 import sys
+import requests
 
 ################################
 # Load config
 ################################
 
-
-with open(config.config_location()) as json_data_file:
-    conf = json.load(json_data_file)
-
+conf = config.Config().config
 
 ################################
 # Logging
 ################################
 
-
 logger = logging.getLogger(__name__)
-
 
 ################################
 # Init
@@ -27,7 +21,6 @@ logger = logging.getLogger(__name__)
 
 url = conf['sonarr']['host']
 headers = {'X-Api-Key': conf['sonarr']['api']}
-
 
 ################################
 # Main

@@ -1,0 +1,17 @@
+# Config
+*.json
+
+# Logs
+logs/*.log*
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.pyc
+
+# Pyenv
+.python-version
+
+# Keep empty folders
+!.keep
