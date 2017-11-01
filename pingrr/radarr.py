@@ -28,7 +28,7 @@ headers = {'X-Api-Key': conf['radarr']['api']}
 
 
 def get_library():
-    """Get sonarr library in a list of imdb ids"""
+    """Get radarr library in a list of imdb ids"""
     library = []
     r = requests.get(url + '/api/movie', headers=headers, timeout=5.000)
     try:
