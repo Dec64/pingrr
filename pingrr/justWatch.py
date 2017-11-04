@@ -2,6 +2,7 @@ import requests
 import logging
 import urllib
 import config
+
 from time import sleep
 
 ################################
@@ -25,68 +26,11 @@ logger = logging.getLogger(__name__)
 # Init
 ################################
 
-headers = {'content-type': 'application/json',
-           'trakt-api-version': '2',
-           'trakt-api-key': "661beaf337a80ade68c88603cef20b4b80e529752017e5a04d63d264757eca42"}
+import pingrr.trakt as trakt
 
 ################################
 # Main
 ################################
-
-
-def get_info_search(title, trakt_type):
-    """Get info for a show or movie from trakt"""
-    url = "https://api.trakt.tv/search/{}?query={}&extended=full".format(trakt_type, urllib.quote_plus(title))
-    logger.debug('getting info from trakt for ' + title)
-    try:
-        r = requests.get(url=url, headers=headers, timeout=5.000)
-    except requests.exceptions.ReadTimeout:
-        return False
-    y = r.json()
-    x = []
-
-    if r.status_code == requests.codes.ok and len(y):
-        if trakt_type == "movie":
-            y = y[0]['movie']
-            x.append({'title': y['title'],
-                    #'status': y['status'],
-                    #'tvdb': y['ids']['tvdb'],
-                    'imdb': y['ids']['imdb'],
-                    'trakt': y['ids']['trakt'],
-                    'rating': y['rating'],
-                    'language': y['language'],
-                    #'country': y['country'],
-                    'genres': y['genres'],
-                    #'network': y['network'],
-                    'votes': y['votes'],
-                    'runtime': y['runtime'],
-                    'year': y['year']
-                    })
-            logger.debug('got movie show info successfully')
-            return x
-
-        else:
-            y = y[0]['show']
-            x.append({'title': y['title'],
-                    'status': y['status'],
-                    'tvdb': y['ids']['tvdb'],
-                    'imdb': y['ids']['imdb'],
-                    'trakt': y['ids']['trakt'],
-                    'rating': y['rating'],
-                    'language': y['language'],
-                    'country': y['country'],
-                    'genres': y['genres'],
-                    'network': y['network'],
-                    'votes': y['votes'],
-                    'runtime': y['runtime'],
-                    'year': y['year']
-                    })
-            logger.debug('got tv show info successfully')
-            return x
-
-    else:
-        logger.debug('failed to get trakt show info, code return: {}'.format(r.status_code))
-        return False
 
 
 #def get_providers():
@@ -153,7 +97,7 @@ def create_list():
                             if "?" in show_title:
                                 show_title = show_title.replace("?", "")
                             sleep(0.5)
-                            y = get_info_search(show_title.encode('utf8'), "show")
+                            y = trakt.get_info_search(show_title.encode('utf8'), "show")
                             if not y:
                                 logger.info("trakt api connection timed out, failed to get show\n"
                                             "Continuing, will be missing some possible shows")
@@ -161,7 +105,7 @@ def create_list():
                             #while not y:
                             #    logger.info("trakt api connection timed out, trying again in 5mins")
                             #    sleep(350)
-                            #    y = get_info_search(show_title.encode('utf8'), "show")
+                            #    y = trakt.get_info_search(show_title.encode('utf8'), "show")
                             if y:
                                 if y[0]['title'].lower() == item['show_title'].lower() and y not in tv_list:
                                     logger.debug(item['show_title'])
@@ -175,9 +119,8 @@ def create_list():
                             pass
 
                         ### TODO add radarr/movie support
-                        #y = get_info_search(item['show_title'].encode('utf8'), "movie")
+                        #y = trakt.get_info_search(item['show_title'].encode('utf8'), "movie")
                         #if y[0]['title'].lower() == item['title'].lower():
-                        #logger.info(get_info_search(item['title'].encode('utf8'), "movie"))
                         #movie_list.append(y)
                         #else:
                         #logger.info("no movie title found " + item['title'])
