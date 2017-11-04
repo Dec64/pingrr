@@ -372,11 +372,10 @@ class Config(object):
                 "country": "",
                 "year": filters_year
             },
-            "unogs": {
-                "enabled": '',
-                "api": '',
-                "country": '',
-                "days": ''
+            "just_watch": {
+                "enabled": False,
+                "country": 'US',
+                "pages": 1
             },
             "allflicks": {
                 "enabled": self.str2bool(allflicks_enabled),

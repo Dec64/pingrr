@@ -185,7 +185,7 @@ def create_list():
                 y = []
                 for tv in shows['data']:
                     try:
-                        x = trakt.get_info_search(tv['title'])
+                        x = trakt.get_info_search(tv['title'], "show")
                         title1 = x[0]['title']
                         title2 = tv['title']
                         s1 = fuzz.token_sort_ratio(title1, title1)
