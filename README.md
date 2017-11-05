@@ -73,6 +73,63 @@ Logging level can be increased if you are having issues and want more output in 
 To list all possible arguments and options run:
 - `python pingrr.py -h`
 
+### Blacklist
+
+There is a blacklist.json file created on first run. This file will
+have failed shows and any show you want to add to it outside of filters that
+you never want to add. To add a show, either use the shows IMDB id or TVDB id.
+
+```
+{"blacklist": ["imdb id", "or tvdb id", "332493", "75760", "79168", "334069"]}
+```
+
+### Just Watch
+
+https://www.justwatch.com/
+
+Early support for justwatch is included.
+
+```
+    "just_watch": {
+        "enabled": true,
+        "country": "GB",
+        "pages": "1"
+    }
+```
+
+Each page is a single day, so if you set 1 page, it will check against
+all services justwatch supports in your chosen country for the last day.
+
+Set more pages to scan back more days, doing this will cause the scan to
+take longer and potentially add a lot of shows.
+
+Should support any two letter country code that Just Watch has data for.
+
+E.g:
+```
+Germany
+Austria
+Switzerland
+United Kingdom
+Ireland
+Russia
+Italy
+France
+Spain
+Netherlands
+Norway
+Sweden
+Denmark
+Finland
+Lithuania
+Latvia
+Estonia
+USA
+Canada
+Mexico
+
+and more
+```
 
 ### Config
 
@@ -156,6 +213,20 @@ must remove `Restart=always RestartSec=10` from systemd file, otherwise it will 
 
 ### Todo
 
-1. Radarr support for netflix list
-2. More list sources if found
-3. Easier config generation
+1. Radarr support
+2. Learn python
+
+### Thanks
+
+Thanks to horjulf and l3uddz for assisting me with a few bits so far,
+and everyone that helped test it along the way.
+
+If you have any suggestions for features ect, feel free to create a new issue
+on github for it!
+
+### Donate
+
+If you absolutely feel the need to donate, the link is below.
+Pull requests and help cleaning up my amateur python would be more helpful :)
+
+[![paypal](https://www.paypalobjects.com/en_US/i/btn/btn_donateCC_LG.gif)](https://www.paypal.me/Dec64)
