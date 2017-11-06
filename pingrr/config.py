@@ -168,7 +168,7 @@ class Config(object):
     @staticmethod
     def get_quality_profiles(sonarr_url, key):
         url = sonarr_url
-        r = requests.get(url + '/api/profile', headers={'X-Api-Key': key}, timeout=5.000)
+        r = requests.get(url + '/api/profile', headers={'X-Api-Key': key}, timeout=10)
         data = r.json()
         for profile in data:
             if profile['name']:
@@ -185,7 +185,7 @@ class Config(object):
     @staticmethod
     def check_api(sonarr_url, api_key):
         url = sonarr_url
-        r = requests.get(url + '/api/system/status', headers={'X-Api-Key': api_key}, timeout=5.000)
+        r = requests.get(url + '/api/system/status', headers={'X-Api-Key': api_key}, timeout=10)
         if r.status_code == 200:
             return True
         else:
@@ -195,7 +195,7 @@ class Config(object):
     def check_host(sonarr_url):
         url = sonarr_url
         try:
-            r = requests.get(url + '/api/system/status', timeout=5.000)
+            r = requests.get(url + '/api/system/status', timeout=10)
             if r.status_code == 401:
                 return True
             else:
