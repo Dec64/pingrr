@@ -189,7 +189,7 @@ def check_lists(arg, arg2):
 def load_blacklist():
     data = []
     try:
-        with open('blacklist.json') as data_file:
+        with open(configuration.settings['blacklist']) as data_file:
             temp_blacklist = json.load(data_file)
             for item in temp_blacklist['blacklist']:
                 data.append(item)
@@ -197,7 +197,7 @@ def load_blacklist():
     except IOError:
         logger.info("No blacklist file, creating a blank file now")
         temp_blacklist = {"blacklist": ["imdb id", "or tvdb id"]}
-        with open('blacklist.json', 'w') as data_file:
+        with open(configuration.settings['blacklist'], 'w') as data_file:
             json.dump(temp_blacklist, data_file)
         return temp_blacklist
 

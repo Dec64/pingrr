@@ -29,6 +29,8 @@ VOLUME /config
 ENV PINGRR_CONFIG=/config/config.json
 # Pingrr log file
 ENV PINGRR_LOGFILE=/config/pingrr.log
+# Blacklist file
+ENV PINGRR_BLACKLIST=/config/blacklist.json
 
 # Entrypoint
 ENTRYPOINT ["python2", "pingrr.py"]
