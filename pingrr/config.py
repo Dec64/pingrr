@@ -44,6 +44,11 @@ class Config(object):
             'argv': '--loglevel',
             'env': 'PINGRR_LOGLEVEL',
             'default': 'INFO'
+        },
+        'blacklist': {
+            'argv': '--blacklist',
+            'env': 'PINGRR_BLACKLIST',
+            'default': os.path.join(os.path.dirname(sys.argv[0]), 'blacklist.json')
         }
     }
 
@@ -87,6 +92,14 @@ class Config(object):
             self.base_settings['loglevel']['argv'],
             choices=('WARN', 'INFO', 'DEBUG'),
             help='Log level (default: %s)' % self.base_settings['loglevel']['default']
+        )
+
+        # Blacklist file
+        parser.add_argument(
+            self.base_settings['blacklist']['argv'],
+            nargs='?',
+            const=None,
+            help='Blacklist file (default: %s)' % self.base_settings['blacklist']['default']
         )
 
         return vars(parser.parse_args())
