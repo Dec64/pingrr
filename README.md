@@ -1,5 +1,6 @@
-![alt text](http://img.pixady.com/2017/09/143837_pingrr.png)<br />
+![alt text](http://img.pixady.com/2017/09/143837_pingrr.png)
 # pingrr.
+
 Python script that checks certain lists on [Trakt](http://trakt.tv) and [Netflix's](https://www.allflicks.net/) recently added shows, as well as
  [JustWatch](https://www.justwatch.com/)'s recent shows and if they meet your configured filters, adds them to your sonarr library.
 
@@ -139,7 +140,7 @@ There are a few config settings that are not set by the user on first run,
 if you fancy messing with more advanced settings you can open up the config.json
 file and change as needed.
 
-`"rating_match":94` <br />
+##### `"rating_match":94`
 How close the match has to be out of 100 when parsing netflix titles.
 If you feel you are missing some titles feel free to play with this figure, but anything lower
 then 90 will most likely result in incorrect matches.

@@ -1,7 +1,7 @@
 import requests
 import logging
-import urllib
 import config
+import pingrr.trakt as trakt
 
 from time import sleep
 
@@ -9,12 +9,7 @@ from time import sleep
 # Load config
 ################################
 
-# Load initial config
-configuration = config.Config()
-
-# Load config file
-configuration.load()
-conf = configuration.config
+conf = config.Config().config
 
 ################################
 # Logging
@@ -23,17 +18,10 @@ conf = configuration.config
 logger = logging.getLogger(__name__)
 
 ################################
-# Init
-################################
-
-import pingrr.trakt as trakt
-
-################################
 # Main
 ################################
 
-
-#def get_providers():
+# def get_providers():
 #    r = requests.get("https://apis.justwatch.com/content/providers/locale/en_" + conf['just_watch']['country'])
 #    providers = []
 #    for x in r.json():

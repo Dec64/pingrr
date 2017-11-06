@@ -57,18 +57,30 @@ import pingrr.allflicks as allflicks
 import pingrr.justWatch as justwatch
 from pingrr.notifications import Notifications
 
-sent = None
 new_shows = []
 delay_time = conf['pingrr']['timer'] * 3600
-options = {"ignoreEpisodesWithFiles": False, "ignoreEpisodesWithoutFiles": False, "searchForMissingEpisodes": True}
+options = {
+    "ignoreEpisodesWithFiles": False,
+    "ignoreEpisodesWithoutFiles": False,
+    "searchForMissingEpisodes": conf['sonarr']['search_missing_episodes']
+}
 notify = Notifications()
 
 if conf['pushover']['enabled']:
-    notify.load(service="pushover", app_token=conf['pushover']['app_token'], user_token=conf['pushover']['user_token'])
-if conf['slack']['enabled']:
-    notify.load(service="slack", webhook_url=conf['slack']['webhook_url'], sender_name=conf['slack']['sender_name'],
-                sender_icon=conf['slack']['sender_icon'], channel=conf['slack']['channel'])
+    notify.load(
+        service="pushover",
+        app_token=conf['pushover']['app_token'],
+        user_token=conf['pushover']['user_token']
+    )
 
+if conf['slack']['enabled']:
+    notify.load(
+        service="slack",
+        webhook_url=conf['slack']['webhook_url'],
+        sender_name=conf['slack']['sender_name'],
+        sender_icon=conf['slack']['sender_icon'],
+        channel=conf['slack']['channel']
+    )
 
 ################################
 # Main
@@ -77,17 +89,29 @@ if conf['slack']['enabled']:
 
 def send_to_sonarr(a, b):
     """Send found tv program to sonarr"""
-    payload = {"tvdbId": a, "title": b, "qualityProfileId": conf['sonarr']['quality_profile'], "seasons": [],
-               "seasonFolder": True, "rootFolderPath": conf['sonarr']['folder_path'], "addOptions": options,
-               "images": []}
-    r = post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=5.000)
-    global sent
-    sent = payload
+
+    payload = {
+        "tvdbId": a,
+        "title": b,
+        "qualityProfileId": conf['sonarr']['quality_profile'],
+        "images": [],
+        "seasons": [],
+        "seasonFolder": True,
+        "monitored": conf['sonarr']['monitored'],
+        "rootFolderPath": conf['sonarr']['folder_path'],
+        "addOptions": options,
+    }
+
+    r = post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=10)
+
     if r.status_code == 201:
-        logger.debug('sent to sonarr successfully')
+        logger.debug("sent to sonarr successfully")
+
         return True
+
     else:
-        logger.debug('failed to send to sonarr, code return: {}'.format(r.status_code))
+        logger.debug("failed to send to sonarr, code return: %r", r.status_code)
+
         return False
 
 

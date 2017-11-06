@@ -63,7 +63,7 @@ def get_info_search(tv_id):
     """Get info for a tv show"""
     url = "https://api.trakt.tv/search/show?query=" + urllib.quote_plus(tv_id) + "&extended=full"
     logger.debug('getting info from trakt for ' + tv_id)
-    r = requests.get(url=url, headers=headers, timeout=5.000)
+    r = requests.get(url=url, headers=headers, timeout=10)
     if r.status_code == requests.codes.ok:
         x = []
         y = r.json()

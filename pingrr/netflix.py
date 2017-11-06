@@ -31,7 +31,7 @@ headers = {"X-Mashape-Key": conf['unogs']['api'], "Accept": "application/json"}
 
 def get_list():
     """get list of recently added netflix items"""
-    r = requests.get(url=url, headers=headers, timeout=5.000)
+    r = requests.get(url=url, headers=headers, timeout=10)
     if r.status_code == requests.codes.ok:
         logger.debug('got raw netflix list successfully')
         return r.json()

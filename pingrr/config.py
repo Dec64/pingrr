@@ -168,7 +168,7 @@ class Config(object):
     @staticmethod
     def get_quality_profiles(sonarr_url, key):
         url = sonarr_url
-        r = requests.get(url + '/api/profile', headers={'X-Api-Key': key}, timeout=5.000)
+        r = requests.get(url + '/api/profile', headers={'X-Api-Key': key}, timeout=10)
         data = r.json()
         for profile in data:
             if profile['name']:
@@ -185,7 +185,7 @@ class Config(object):
     @staticmethod
     def check_api(sonarr_url, api_key):
         url = sonarr_url
-        r = requests.get(url + '/api/system/status', headers={'X-Api-Key': api_key}, timeout=5.000)
+        r = requests.get(url + '/api/system/status', headers={'X-Api-Key': api_key}, timeout=10)
         if r.status_code == 200:
             return True
         else:
@@ -195,7 +195,7 @@ class Config(object):
     def check_host(sonarr_url):
         url = sonarr_url
         try:
-            r = requests.get(url + '/api/system/status', timeout=5.000)
+            r = requests.get(url + '/api/system/status', timeout=10)
             if r.status_code == 401:
                 return True
             else:
@@ -235,6 +235,12 @@ class Config(object):
         print '\033[94m' + str(sonarr_folder_path) + '\x1b[0m' + '\n'
         sonarr_quality_profile = self.get_quality_profiles(sonarr_host, sonarr_api)
         print '\033[94m' + str(sonarr_quality_profile) + '\x1b[0m' + '\n'
+
+        sonarr_monitored = raw_input("Add TV Shows as monitored? (yes/no): \n")
+        print '\033[94m' + str(self.str2bool(sonarr_monitored)) + '\x1b[0m' + '\n'
+
+        sonarr_search_episodes = raw_input("Search for missing episodes? (yes/no): \n")
+        print '\033[94m' + str(self.str2bool(sonarr_search_episodes)) + '\x1b[0m' + '\n'
 
         print "\n"
         print "####################################\n" \
@@ -333,7 +339,9 @@ class Config(object):
                 "host": sonarr_host,
                 "quality_profile": sonarr_quality_profile,
                 "folder_path": sonarr_folder_path,
-                "api": sonarr_api
+                "api": sonarr_api,
+                "monitored": self.str2bool(sonarr_monitored),
+                "search_missing_episodes": self.str2bool(sonarr_search_episodes)
             },
             "trakt": {
                 "api": trakt_api,
