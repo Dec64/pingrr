@@ -120,37 +120,35 @@ def add_shows():
     added_list = []
     n = 0
     limit = conf['pingrr']['limit']
+
     for show in new_shows:
         if show['tvdb'] not in sonarr_library:
             title = show['title']
             tvdb_id = show['tvdb']
+
             try:
                 logger.info('sending show to sonarr: {}'.format(show['title'].encode('utf8')))
+
                 if send_to_sonarr(tvdb_id, title):
                     logger.info('{} has been added to Sonarr'.format(title.encode('utf8')))
                     added_list.append(show['title'])
+
                     n += 1
                     if 0 < limit == n:
                         logger.info('{} shows added limit reached'.format(str(n)))
+
                         break
+
                     elif limit > 0 and not n == limit:
                         logger.debug('limit not yet reached: {}'.format(str(n)))
+
                 else:
-                    # Open current blacklist
-                    data = []
-                    with open('blacklist.json') as data_file:
-                        temp_blacklist = json.load(data_file)
-                    # Update blacklist from temp
-                    for item in temp_blacklist['blacklist']:
-                        data.append(item)
-                    data.append(str(show['tvdb']))
-                    temp_blacklist = {"blacklist": data}
-                    # Save amened blacklist to file
-                    with open('blacklist.json', 'w') as data_save:
-                        json.dump(temp_blacklist, data_save)
+                    configuration.blacklist.add(str(show['tvdb']))
                     logger.warning('{} failed to be added to Sonarr! Adding to blacklist'.format(title.encode('utf8')))
+
             except IOError:
                 logger.warning('error sending show: {} tvdbid: {}'.format(title.encode('utf8'), str(tvdb_id)))
+
     if conf['pushover']['enabled'] or conf['slack']['enabled'] and n != 0:
         if n > 1:
             text = (str(n), "TV Show", "have", str(len(new_shows)))
@@ -186,27 +184,11 @@ def check_lists(arg, arg2):
     return False
 
 
-def load_blacklist():
-    data = []
-    try:
-        with open(configuration.settings['blacklist']) as data_file:
-            temp_blacklist = json.load(data_file)
-            for item in temp_blacklist['blacklist']:
-                data.append(item)
-            return data
-    except IOError:
-        logger.info("No blacklist file, creating a blank file now")
-        temp_blacklist = {"blacklist": ["imdb id", "or tvdb id"]}
-        with open(configuration.settings['blacklist'], 'w') as data_file:
-            json.dump(temp_blacklist, data_file)
-        return temp_blacklist
-
-
 def filter_check(arg):
     title = arg
     country = title[0]['country']
     lang = title[0]['language']
-    if str(title[0]['imdb']) in blacklist or str(title[0]['tvdb']) in blacklist:
+    if str(title[0]['imdb']) in configuration.blacklist or str(title[0]['tvdb']) in configuration.blacklist:
         logger.info("{} was rejected as it was found in the blacklist".format(title[0]['title'].encode('utf8')))
         return False
     if conf['filters']['year'] > title[0]['year']:
@@ -283,19 +265,19 @@ def remove_dupes(dupe_list):
 
 if __name__ == "__main__":
     while True:
-        try:
-            blacklist = load_blacklist()
-        except ValueError:
-            logger.warning("blacklist.json file invalid, please fix and restart")
-            sys.exit(1)
         new_check()
+        # Save updated blacklist
+        configuration.save_blacklist()
+
         if conf['pingrr']['timer'] == 0:
             logger.info('Scan finished, shutting down')
             sys.exit()
+
         if conf['pingrr']['timer'] > 1:
             hours = "s"
         else:
             hours = ""
+
         logger.info("check finish, sleeping for {} hour{}".format(conf['pingrr']['timer'], hours))
         sleep(float(delay_time))
         logger.debug('sleep over, checking again')

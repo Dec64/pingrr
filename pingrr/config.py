@@ -59,6 +59,7 @@ class Config(object):
         self.settings = self.get_settings()
         # Config
         self.config = None
+        self.blacklist = set()
 
     # Parse command line arguments
     def parse_args(self):
@@ -138,6 +139,26 @@ class Config(object):
 
         return setts
 
+    def save_blacklist(self):
+        with open(self.settings['blacklist'], 'w') as data_file:
+            json.dump(
+                {"blacklist": list(self.blacklist)},
+                data_file
+            )
+
+    def load_blacklist(self):
+        try:
+            with open(self.settings['blacklist']) as data_file:
+                self.blacklist = set(json.load(data_file)['blacklist'])
+
+        except IOError:
+            logger.info("No blacklist file, creating a blank file now.")
+            self.save_blacklist()
+
+        except (TypeError, IndexError, ValueError):
+            logger.warning("Blacklist file contains invalid syntax, please check.")
+            sys.exit(1)
+
     def load(self):
         if os.path.exists(self.settings['config']):
             with open(self.settings['config'], 'r') as f:
@@ -146,6 +167,9 @@ class Config(object):
         else:
             logger.warn("No config file found, creating new config.")
             self.create_config(self.settings['config'])
+
+        # Load blacklist
+        self.load_blacklist()
 
     ################################
     # Create config
