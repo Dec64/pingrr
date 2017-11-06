@@ -236,6 +236,12 @@ class Config(object):
         sonarr_quality_profile = self.get_quality_profiles(sonarr_host, sonarr_api)
         print '\033[94m' + str(sonarr_quality_profile) + '\x1b[0m' + '\n'
 
+        sonarr_monitored = raw_input("Add TV Shows as monitored? (yes/no): \n")
+        print '\033[94m' + str(self.str2bool(sonarr_monitored)) + '\x1b[0m' + '\n'
+
+        sonarr_search_episodes = raw_input("Search for missing episodes? (yes/no): \n")
+        print '\033[94m' + str(self.str2bool(sonarr_search_episodes)) + '\x1b[0m' + '\n'
+
         print "\n"
         print "####################################\n" \
               "############# TRAKT ################\n" \
@@ -333,7 +339,9 @@ class Config(object):
                 "host": sonarr_host,
                 "quality_profile": sonarr_quality_profile,
                 "folder_path": sonarr_folder_path,
-                "api": sonarr_api
+                "api": sonarr_api,
+                "monitored": self.str2bool(sonarr_monitored),
+                "search_missing_episodes": self.str2bool(sonarr_search_episodes)
             },
             "trakt": {
                 "api": trakt_api,
