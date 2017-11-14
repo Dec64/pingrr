@@ -364,7 +364,6 @@ def filter_list(list_type):
 
     filtered = []
     for title in raw_list:
-        logger.info(title)
         try:
             # If not already in the list, check against filters
             if filter_check(title, list_type) and title[item_id] not in filtered:
