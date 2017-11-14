@@ -1,14 +1,14 @@
 ![alt text](http://img.pixady.com/2017/09/143837_pingrr.png)
 # pingrr.
 
-Python script that checks certain lists on [Trakt](http://trakt.tv) and [Netflix's](https://www.allflicks.net/) recently added shows, as well as
- [JustWatch](https://www.justwatch.com/)'s recent shows and if they meet your configured filters, adds them to your sonarr library.
+Python script that checks certain lists on [Trakt](http://trakt.tv) and [Netflix's](https://www.allflicks.net/) recently added shows/movies, as well as
+ [JustWatch](https://www.justwatch.com/)'s recent shows/movies and if they meet your configured filters, adds them to your sonarr/radarr library.
 
 Currently supports:
 1. [Trakt Trending](https://trakt.tv/shows/trending)
 2. [Trakt Anticipated](https://trakt.tv/shows/anticipated)
 3. [Trakt Popular](https://trakt.tv/shows/popular)
-4. [Netflix recently added](https://www.allflicks.net/)
+4. [Netflix recently added](https://www.allflicks.net/) # Currently not supported, use justwatch
 5. [Just Watch recently added](https://www.justwatch.com/)
 
 ## Getting Started
@@ -29,6 +29,7 @@ you can create a new API app in trakt [here](https://trakt.tv/oauth/applications
 2. requests
 3. BeautifulSoup
 4. fuzzywuzzy
+5. ImdbPY
 
 `sudo apt-get install python`
 
@@ -140,6 +141,124 @@ There are a few config settings that are not set by the user on first run,
 if you fancy messing with more advanced settings you can open up the config.json
 file and change as needed.
 
+Please see below for an explanation for the current config
+
+```
+{
+    "allflicks": {
+        "enabled": {
+            "movies": true,
+            "shows": false
+        },
+        "rating_match": 94
+    },
+    "filters": {
+        "allow_canceled": true, ## allow shows that are cancelled to be added
+        "allow_ended": true, ## allow shows that are finished to be added
+        "country": ["gb","us","ca"], ## What countrys shows/movies are allowed to be from (whitelist)
+        "genre": [], ## What genres shows/movies are NOT allowed to be from (blacklist)
+        "language": "en", ## What language is allowed for shows/movies (whitelist)
+        "network": "YouTube", ## What networks to NOT allow (blacklist)
+        "rating": 3, ## Min rating show/movie must have to be added
+        "runtime": 0, ## Min runtime show/movie must have to be added
+        "votes": 1, ## Min votes show/movie must have to be added
+        "year": 0 ## Min year show/movie must be to be added (can do range. e.g. 2005-2007)
+    },
+    "pingrr": {
+        "limit": {
+            "sonarr": 0, ## Amount of shows to be added per cycle
+            "radarr": 0 ## Amount of movies to be added per cycle
+        },
+        "log_level": "info", ## Log level for pingrr
+        "timer": 1.00, ## How long to wait, in hours, untill next scan
+        "aired": 10 ## If show has less episodes then this aired, do not count towards limit
+    },
+    "pushover": {
+        "app_token": "",
+        "enabled": true,
+        "user_token": ""
+    },
+    "slack": {
+        "channel": "",
+        "enabled": false,
+        "sender_icon": ":robot_face:",
+        "sender_name": "Pingrr",
+        "webhook_url": ""
+    },
+    "sonarr": {
+        "api": "",
+        "folder_path": "/mnt/media/TV/", ## Default root folder path shows will be sent to
+        "quality_profile": 1, ## Quality profile ID to assign to show in sonarr
+        "monitored": true, ## Add show monitored or not
+        "search_missing_episodes": true, ## Search for missing episodes on add or not
+        "genre_paths": true, ## Use genre paths, change folder path for show depending on catagory
+        "path_root": "/mnt/media/", ## Root of the path. Only need if using genre paths
+        "paths": {  ## "Kids-TV": [children] == /mnt/media/Kids-TV for any show with genre "children". Add more as needed. Resolves in order. If show is Anime, will be sent to anime before Kids-TV in this example.
+            "Anime": [
+            "anime"
+        ],
+            "Kids-TV": [
+            "children"
+        ],
+            "Travel-TV": [
+            "documentary"
+        ],
+            "Reality-TV": [
+            "reality",
+                "game-show"
+        ]
+        }
+    },
+        "radarr": {
+        "api": "",
+        "folder_path": "/mnt/media/Movies/",
+        "host": "http://localhost:7878",
+        "quality_profile": 1,
+        "monitored": true,
+        "genre_paths": true,
+        "path_root": "/mnt/media/",
+        "paths": {
+            "Anime": [
+            "anime"
+        ],
+            "Kids-TV": [
+            "children"
+        ],
+            "Travel-TV": [
+            "documentary"
+        ],
+            "Reality-TV": [
+            "reality",
+                "game-show"
+        ]
+        }
+    },
+    "trakt": {
+        "api": "", ## Client ID from trakt
+        "imdb_info": false, ## Use imdb info for votes/genres/vote count if possible instead of trakt. WARNING, MUCH SLOWER THEN TRAKT.
+        "limit": 2000, ## Max shows trakt will return. Use a higher number, e.g. 1000 to return a lot.
+        "tv_list": {
+            "anticipated": false,  ## Enable trakt tv anticipated
+            "popular": false,	## Enable trakt tv popular
+            "trending": false	## Enable trakt tv trending
+        },
+        "movie_list": {
+            "anticipated": true, ## Enable trakt movie anticipated
+            "popular": true, ## Enable trakt movie popular
+            "trending": true ## Enable trakt movie trending
+        }
+    },
+    "just_watch": {
+        "enabled": {
+            "movies": true, ## Enable justwatch for movies
+            "shows": false ## Enable justwatch for shows
+        },
+        "country": "GB", ## What country to get justwatch info based on, e.g. GB or US
+        "pages": "20" ## How many pages to get info from, 1 page = 1 day. Add more pages to add more content. Will be slower with more pages
+    }
+}
+```
+
 ##### `"rating_match":94`
 How close the match has to be out of 100 when parsing netflix titles.
 If you feel you are missing some titles feel free to play with this figure, but anything lower
@@ -216,8 +335,7 @@ must remove `Restart=always RestartSec=10` from systemd file, otherwise it will 
 
 ### Todo
 
-1. Radarr support
-2. Learn python
+1. Learn python
 
 ### Thanks
 
