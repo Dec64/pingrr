@@ -3,6 +3,9 @@ import config
 import time
 import requests
 import urllib
+import re
+
+import imdb
 
 ################################
 # Load config
@@ -20,6 +23,8 @@ logger = logging.getLogger(__name__)
 # Init
 ################################
 
+i = imdb.IMDb()
+
 data = []
 headers = {
     'content-type': 'application/json',
@@ -35,218 +40,243 @@ trending = []
 ################################
 
 
-#def get_info_search(tv_id):
-#    """Get info for a tv show"""
-#    url = "https://api.trakt.tv/search/show?query=" + urllib.quote_plus(tv_id) + "&extended=full"
-#    logger.debug('getting info from trakt for ' + tv_id)
-#    r = requests.get(url=url, headers=headers, timeout=5.000)
-#    if r.status_code == requests.codes.ok:
-#        x = []
-#        y = r.json()
-#        y = y[0]['show']
-#        x.append({'title': y['title'],
-#                  'status': y['status'],
-#                  'tvdb': y['ids']['tvdb'],
-#                  'imdb': y['ids']['imdb'],
-#                  'trakt': y['ids']['trakt'],
-#                  'rating': y['rating'],
-#                  'language': y['language'],
-#                  'country': y['country'],
-#                  'genres': y['genres'],
-#                  'network': y['network'],
-#                  'votes': y['votes'],
-#                  'runtime': y['runtime'],
-#                  'year': y['year']
-#                  })
-#        logger.debug('got tv show info successfully')
-#        return x
-#    else:
-#        logger.debug('failed to get trakt show info, code return: ' + str(r.status_code))
-#        return False
+def search(search_string, trakt_type):
+    """Get info for a tv show or movie"""
 
-
-def get_info_search(tv_id, trakt_type):
-    """Get info for a tv show"""
-
-    if tv_id is None:
+    if search_string is None:
         return False
 
-    url = "https://api.trakt.tv/search/" + trakt_type + "?query=" + urllib.quote_plus(tv_id) + "&extended=full"
-    logger.debug('getting info from trakt for ' + tv_id)
+    url = "https://api.trakt.tv/search/{}?query={}&extended=full"\
+        .format(trakt_type, urllib.quote_plus(search_string.encode('utf8')))
+    logger.debug('getting info from trakt for {}'.format(search_string.encode('utf8')))
     r = requests.get(url=url, headers=headers, timeout=10)
 
-    if r.status_code == requests.codes.ok:
+    # If request was as ok, and json data returned continue
+    if r.status_code == requests.codes.ok and r.json():
+        x = []
+        y = r.json()
+
+        # If the titles do not match exactly do not process
+
+        title1 = re.sub(r'[^\w\s\-]*', '', y[0][trakt_type]['title'].lower())
+        title2 = re.sub(r'[^\w\s\-]*', '', search_string.lower())
+
+        if title1 not in title2:
+            logger.debug("Can't get info for {}, does not match with {}".format(search_string.encode('utf8'), (y[0][trakt_type]['title'].encode('utf8'))))
+            return False
+
         if trakt_type == "movie":
-            x = []
-            y = r.json()
             y = y[0]['movie']
-            x.append({
-                'title': y['title'],
-                # 'status': y['status'],
-                # 'tvdb': y['ids']['tvdb'],
-                'imdb': y['ids']['imdb'],
-                'trakt': y['ids']['trakt'],
-                'rating': y['rating'],
-                'language': y['language'],
-                # 'country': y['country'],
-                'genres': y['genres'],
-                # 'network': y['network'],
-                'votes': y['votes'],
-                'runtime': y['runtime'],
-                'year': y['year']
-            })
+        elif trakt_type == "show":
+            y = y[0]['show']
+
+        user_rating = y['rating']
+        genre = y['genres']
+        votes = y['votes']
+
+        if conf['trakt']['imdb_info']:
+            # Load imdb api for show/movie
+            try:
+                m = i.get_movie(y['ids']['imdb'][2:])
+            except TypeError:
+                return False
+
+            # Get imdb user rating for show/movie
+            try:
+                user_rating = m['user rating']
+            except KeyError:
+                logger.info("{0}:{2} using trakt rating ({1}), not imdb".format(y[0][trakt_type]['title'], user_rating, search_string.encode('utf8')))
+
+            # Get imdb genres for show/movie
+            try:
+                genre = m['genre']
+            except KeyError:
+                logger.info("{0}:{2} using trakt genres ({1}), not imdb".format(y[0][trakt_type]['title'], genre, search_string.encode('utf8')))
+
+            # Get imdb votes for show/movie
+            try:
+                votes = m['votes']
+            except KeyError:
+                logger.info("{0}:{2} using trakt votes ({1}), not imdb".format(y[0][trakt_type]['title'], votes, search_string.encode('utf8')))
+
+        # if movie details where requested return movie payload
+        if trakt_type == "movie":
+            x.append({'title': y['title'],
+                      'tmdb': y['ids']['tmdb'],
+                      'imdb': y['ids']['imdb'],
+                      'trakt': y['ids']['trakt'],
+                      'rating': user_rating,
+                      'language': y['language'],
+                      'genres': genre,
+                      'votes': votes,
+                      'runtime': y['runtime'],
+                      'certification': y['certification'],
+                      'released': y['released'],
+                      'year': y['year']})
             logger.debug('got movie show info successfully')
             return x
 
-        else:
-            x = []
-            y = r.json()
-            y = y[0]['show']
-            x.append({
-                'title': y['title'],
-                'status': y['status'],
-                'tvdb': y['ids']['tvdb'],
-                'imdb': y['ids']['imdb'],
-                'trakt': y['ids']['trakt'],
-                'rating': y['rating'],
-                'language': y['language'],
-                'country': y['country'],
-                'genres': y['genres'],
-                'network': y['network'],
-                'votes': y['votes'],
-                'runtime': y['runtime'],
-                'year': y['year']
-            })
+        # if TV details where requested return TV payload
+        elif trakt_type == "show":
+            x.append({'title': y['title'],
+                      'status': y['status'],
+                      'tvdb': y['ids']['tvdb'],
+                      'imdb': y['ids']['imdb'],
+                      'trakt': y['ids']['trakt'],
+                      'rating': user_rating,
+                      'language': y['language'],
+                      'country': y['country'],
+                      'genres': genre,
+                      'network': y['network'],
+                      'votes': votes,
+                      'runtime': y['runtime'],
+                      'year': y['year'],
+                      'aired': y['aired_episodes']})
             logger.debug('got tv show info successfully')
             return x
 
     else:
-        logger.debug('failed to get trakt show info, code return: ' + str(r.status_code))
+        logger.debug('failed to get trakt show info for {}, code return: {}'.format(search_string, str(r.status_code)))
         return False
 
 
-def make_url(list_type):
-    """Generate the url for trakt api with filters as needed"""
-    if list_type == 'trending':
-        url = "https://api.trakt.tv/shows/" + list_type + "/?limit=100"
+def get_trakt_data(name, cat):
+    """Get trakt list info"""
+
+    if cat == 'trending':
+        url = "https://api.trakt.tv/{}/{}/?limit=100&extended=full".format(name, cat)
     else:
-        url = "https://api.trakt.tv/shows/" + list_type + "/?limit=" + str(conf['trakt']['limit'])
-    logger.debug('created trakt url for: ' + list_type)
-    return url
+        url = "https://api.trakt.tv/{}/{}/?limit={}&extended=full".format(name, cat, str(conf['trakt']['limit']))
 
-
-def get_trakt_popular():
-    """Get trakt popular list info"""
-    r = requests.get(url=make_url('popular'), headers=headers)
-    if r.status_code == requests.codes.ok:
-        logger.debug('got trakt popular list successfully')
-        return r.json()
-    else:
-        logger.debug('failed to get trakt popular list, code return: ' + str(r.status_code))
-        return False
-
-
-def get_trakt_anticipated():
-    """Get trakt anticipated list info"""
-    r = requests.get(url=make_url('anticipated'), headers=headers)
-    if r.status_code == requests.codes.ok:
-        logger.debug('got trakt list anticipated successfully')
-        return r.json()
-    else:
-        logger.debug('failed to get trakt anticipated list, code return: ' + str(r.status_code))
-        return False
-
-
-def get_trakt_trending():
-    """Get trakt anticipated list info"""
-    while True:
-        r = requests.get(url=make_url('trending'), headers=headers)
-        if r.status_code == 200:
-            logger.debug('got trakt trending list successfully')
-            return r.json()
-        else:
-            logger.debug('failed to get trakt trending list, code return: ' + str(r.status_code))
-            logger.debug('trying again in 5 seconds')
-            time.sleep(5)
-
-
-def get_info(tv_id):
-    """Get info for a tv show"""
-
-    if tv_id is None:
-        return False
-
-    url = "https://api.trakt.tv/shows/%s?extended=full" % tv_id
-    logger.debug('getting info from trakt for %r', tv_id)
     r = requests.get(url=url, headers=headers)
 
     if r.status_code == requests.codes.ok:
-        x = []
-        y = r.json()
-        x.append({
-            'title': y['title'],
-            'status': y['status'],
-            'tvdb': y['ids']['tvdb'],
-            'imdb': y['ids']['imdb'],
-            'trakt': y['ids']['trakt'],
-            'rating': y['rating'],
-            'language': y['language'],
-            'country': y['country'],
-            'genres': y['genres'],
-            'network': y['network'],
-            'votes': y['votes'],
-            'runtime': y['runtime'],
-            'year': y['year']
-        })
-        logger.debug('got tv show info successfully')
-        return x
-
+        logger.debug('got trakt {} {} list successfully'.format(name, cat))
     else:
-        logger.debug('failed to get trakt show info, code return: ' + str(r.status_code))
+        logger.debug('failed to get trakt {} {} list, code return: {}'.format(name, cat, str(r.status_code)))
         return False
 
+    response = r.json()
 
-def create_list():
     x = []
-    logger.info('creating list from trakt.tv')
 
-    if conf['trakt']['list']['popular']:
-        for item in get_trakt_popular():
-            show_info = get_info(item['ids']['imdb'])
+    for element in response:
 
-            if show_info:
-                x.append(show_info)
-                logger.debug('adding ' + item['title'] + ' from popular')
+        if cat == 'trending' or cat == 'anticipated':
+            if name == 'shows':
+                obj = element['show']
+            if name == 'movies':
+                obj = element['movie']
+        else:
+            obj = element
 
-            else:
-                logger.warn('Error getting info for ' + item['title'] + ' from popular')
+        user_rating = obj['rating']
+        genre = obj['genres']
+        votes = obj['votes']
 
-    if conf['trakt']['list']['trending']:
-        for item in get_trakt_trending():
-            if item['show']['ids']['imdb'] not in x:
-                show_info = get_info(item['show']['ids']['imdb'])
-                if show_info:
-                    x.append(show_info)
-                    logger.debug('adding ' + item['show']['title'] + ' from trending')
+        if conf['trakt']['imdb_info']:
 
-                else:
-                    logger.warn('Error getting info for ' + item['show']['title'] + ' from trending')
+            # Load imdb api for show/movie
+            try:
+                m = i.get_movie(obj['ids']['imdb'][2:])
+            except TypeError:
+                return False
 
-    if conf['trakt']['list']['anticipated']:
-        for item in get_trakt_anticipated():
-            if item['show']['ids']['imdb'] not in x:
-                show_info = get_info(item['show']['ids']['imdb'])
-                if show_info:
-                    x.append(show_info)
-                    logger.debug('adding ' + item['show']['title'] + ' from anticipated')
+            # Get imdb user rating for show/movie
+            try:
+                user_rating = m['user rating']
+            except KeyError:
+                user_rating = obj['rating']
 
-                else:
-                    logger.warn('Error getting info for ' + item['show']['title'] + ' from anticipated')
+            # Get imdb genres for show/movie
+            try:
+                genre = m['genre']
+            except KeyError:
+                genre = obj['genres']
 
-    else:
-        logger.info('no trakt lists wanted, skipping')
-        pass
+            # Get imdb votes for show/movie
+            try:
+                votes = m['votes']
+            except KeyError:
+                votes = obj['votes']
 
-    logger.info('trakt list created, %d shows found', len(x))
-
+        if name == 'movies':
+            x.append({'title': obj['title'],
+                      'tmdb': obj['ids']['tmdb'],
+                      'imdb': obj['ids']['imdb'],
+                      'trakt': obj['ids']['trakt'],
+                      'rating': user_rating,
+                      'language': obj['language'],
+                      'genres': genre,
+                      'votes': votes,
+                      'runtime': obj['runtime'],
+                      'certification': obj['certification'],
+                      'released': obj['released'],
+                      'year': obj['year']})
+            logger.debug('got movie: {} info successfully'.format(obj['title'].encode('utf8')))
+        else:
+            x.append({'title': obj['title'],
+                      'status': obj['status'],
+                      'tvdb': obj['ids']['tvdb'],
+                      'imdb': obj['ids']['imdb'],
+                      'trakt': obj['ids']['trakt'],
+                      'rating': user_rating,
+                      'language': obj['language'],
+                      'country': obj['country'],
+                      'genres': genre,
+                      'network': obj['network'],
+                      'votes': votes,
+                      'runtime': obj['runtime'],
+                      'year': obj['year'],
+                      'aired': obj['aired_episodes']})
+            logger.debug('got tv show: {} info successfully'.format(obj['title'].encode('utf8')))
     return x
+
+
+# def get_json_data(tvdb):
+#     url = "http://skyhook.sonarr.tv/v1/tvdb/shows/en/{}".format(tvdb)
+#     r = requests.get(url)
+#     if r.status_code == requests.codes.ok:
+#         logger.debug('got json data for {} successfully'.format(tvdb))
+#         return r.json()
+#     else:
+#         logger.debug('failed to get json data for {}'.format(tvdb))
+#         return False
+
+
+def get_info(arg):
+
+    trakt_temp_tv = []
+    trakt_temp_movie = []
+
+    if arg == 'tv':
+        logger.info("Checking if any trakt tv lists are required")
+        for tv_list in conf['trakt']['tv_list']:
+            if conf['trakt']['tv_list'][tv_list]:
+                logger.info("Getting {} tv list from trakt".format(tv_list))
+                trakt_temp_tv.append(get_trakt_data('shows', tv_list))
+
+        trakt_complete_tv = []
+
+        for trakt_list in trakt_temp_tv:
+            for line in trakt_list:
+                if line not in trakt_complete_tv:
+                    trakt_complete_tv.append(line)
+
+        return trakt_complete_tv
+
+    if arg == 'movie':
+        logger.info("Checking if any trakt movie lists are required")
+        for movie_list in conf['trakt']['movie_list']:
+            if conf['trakt']['movie_list'][movie_list]:
+                logger.info("Getting {} movie list from trakt".format(movie_list))
+                trakt_temp_movie.append(get_trakt_data('movies', movie_list))
+
+        trakt_complete_movie = []
+
+        for trakt_list in trakt_temp_movie:
+            for line in trakt_list:
+                if line not in trakt_complete_movie:
+                    trakt_complete_movie.append(line)
+
+        return trakt_complete_movie

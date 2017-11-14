@@ -1,6 +1,7 @@
 import requests
 import logging
 import config
+import re
 import pingrr.trakt as trakt
 
 from time import sleep
@@ -29,11 +30,16 @@ logger = logging.getLogger(__name__)
 #    return providers
 
 
-def get_recent(page):
+def get_recent(page, get_type):
+
+    if get_type == "movies":
+        content_type = "%5B%22movie%22%5D"
+    elif get_type == "shows":
+        content_type = "%5B%22show_season%22%5D"
 
     r = requests.get("https://apis.justwatch.com/content/titles/en_{}/new?body=%7B%22"
                      "age_certifications%22:null,"
-                     "%22content_types%22:%5B%22show_season%22%5D,"
+                     "%22content_types%22:{},"
                      "%22genres%22:null,"
                      "%22languages%22:null,"
                      "%22max_price%22:null,"
@@ -48,7 +54,7 @@ def get_recent(page):
                      "%22release_year_from%22:null,"
                      "%22release_year_until%22:null,"
                      "%22scoring_filter_types%22:null,"
-                     "%22titles_per_provider%22:6%7D".format(conf['just_watch']['country'].upper(), str(page)))
+                     "%22titles_per_provider%22:6%7D".format(conf['just_watch']['country'].upper(), content_type, str(page)))
 
     try:
         if r.status_code == 200:
@@ -61,10 +67,10 @@ def get_recent(page):
         logger.warning("Value Error while getting recent from just watch")
 
 
-def create_list():
+def create_list(wanted):
     logger.info("Creating Just Watch list")
     tv_list = []
-    #movie_list = []
+    movie_list = []
 
     try:
         pages = int(conf['just_watch']['pages'])
@@ -74,46 +80,89 @@ def create_list():
     x = 1
 
     while x <= pages:
-        data = get_recent(x)
+
+        if wanted == "shows":
+            data = get_recent(x, "shows")
+        elif wanted == "movies":
+            data = get_recent(x, "movies")
+
         if data:
             for day in data['days']:
-                logger.debug("Getting new releases from: {}".format(str(day['date'])))
+                logger.info("Getting new releases from: {}".format(str(day['date'])))
                 for provider in day['providers']:
                     for item in provider['items']:
-                        if item['object_type'] == 'show_season':
-                            show_title = item['show_title']
-                            if "?" in show_title:
-                                show_title = show_title.replace("?", "")
-                            sleep(0.5)
-                            y = trakt.get_info_search(show_title.encode('utf8'), "show")
-                            if not y:
-                                logger.info("trakt api connection timed out, failed to get show\n"
-                                            "Continuing, will be missing some possible shows")
-                                break
-                            #while not y:
-                            #    logger.info("trakt api connection timed out, trying again in 5mins")
-                            #    sleep(350)
-                            #    y = trakt.get_info_search(show_title.encode('utf8'), "show")
-                            if y:
-                                if y[0]['title'].lower() == item['show_title'].lower() and y not in tv_list:
-                                    logger.debug(item['show_title'])
-                                    tv_list.append(y)
-                            else:
-                                try:
-                                    logger.debug("Failed to get data on show: {}".format(str(item['show_title'].encode('utf8'))))
-                                except UnicodeEncodeError:
-                                    logger.debug("Failed to get data on show, unicode error: {}".format(item))
-                        elif item['object_type'] == 'movie':
-                            pass
+                        skip = False
 
-                        ### TODO add radarr/movie support
-                        #y = trakt.get_info_search(item['show_title'].encode('utf8'), "movie")
-                        #if y[0]['title'].lower() == item['title'].lower():
-                        #movie_list.append(y)
-                        #else:
-                        #logger.info("no movie title found " + item['title'])
+                        # Get TV from Just Watch
+
+                        if item['object_type'] == 'show_season' and wanted == "shows":
+
+                            for obj in tv_list:
+                                if item['show_title'].lower() in obj[0]['title'].lower():
+                                    skip = True
+
+                            show_title = item['show_title']
+                            show_title = re.sub(r'([^\s\w]|_)+', '', show_title)
+
+                            # Sleep for half a second to avoid trakt api rate limit - Needs more testing
+                            # sleep(0.5)
+
+                            if not skip:
+                                logger.debug(show_title)
+                                y = trakt.search(show_title, "show")
+
+                                if not y:
+                                    logger.debug("failed to get show continuing, will be missing some possible shows")
+                                    break
+
+                                if y:
+                                    if y[0]['title'].lower().replace(":", "") == \
+                                            item['show_title'].lower().replace(":", ""):
+                                        logger.debug(item['show_title'])
+                                        tv_list.append(y)
+                                else:
+                                    try:
+                                        logger.debug("Failed to get data on show: {}".format(str(item['show_title'].encode('utf8'))))
+                                    except UnicodeEncodeError:
+                                        logger.debug("Failed to get data on show, unicode error: {}".format(item))
+
+                        # Get movies from Just Watch
+
+                        elif item['object_type'] == 'movie' and wanted == "movies":
+
+                            for obj in movie_list:
+                                if item['title'].lower() in obj[0]['title'].lower():
+                                    skip = True
+                            movie_title = item['title']
+                            #movie_title = re.sub(r'([^\s\w]|_)+', '', movie_title)
+                            movie_title = re.sub(r'[^\w\s\-]*', '', movie_title)
+
+                            # Sleep for half a second to avoid trakt api rate limit - Needs more testing
+                            # sleep(0.5)
+
+                            if not skip:
+                                y = trakt.search(movie_title, "movie")
+
+                                if not y:
+                                    logger.debug("failed to get movie continuing, will be missing some possible movies")
+                                    break
+
+                                if y:
+                                    if y[0]['title'].lower().replace(":", "") == item['title'].lower().replace(":", ""):
+                                        logger.debug(item['title'])
+                                        movie_list.append(y)
+                                else:
+                                    try:
+                                        logger.debug("Failed to get data on show: {}".format(str(item[movie_title].encode('utf8'))))
+                                    except UnicodeEncodeError:
+                                        logger.debug("Failed to get data on show, unicode error: {}".format(item))
 
         logger.debug('page {}'.format(str(x)))
         x += 1
-    logger.info("Just Watch list created, {} shows found".format(len(tv_list)))
-    return tv_list
+
+    if wanted == "movies":
+        logger.info("Just Watch list created, {} movies found".format(len(movie_list)))
+        return movie_list
+    elif wanted == "shows":
+        logger.info("Just Watch list created, {} movies found".format(len(tv_list)))
+        return tv_list

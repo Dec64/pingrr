@@ -378,20 +378,48 @@ class Config(object):
                 "folder_path": sonarr_folder_path,
                 "api": sonarr_api,
                 "monitored": self.str2bool(sonarr_monitored),
-                "search_missing_episodes": self.str2bool(sonarr_search_episodes)
+                "search_missing_episodes": self.str2bool(sonarr_search_episodes),
+                "genre_paths": False,
+                "path_root": "/mnt/media/",
+                "paths": {
+                    "Anime": ["anime"],
+                    "Kids-TV": ["children, family"],
+                    "Doc-TV": ["documentary"],
+                    "Reality-TV": ["reality", "game-show"]}
+            },
+            "radarr": {
+                "host": "localhost:7878",
+                "quality_profile": "1",
+                "folder_path": "/mnt/movies",
+                "api": "",
+                "monitored": True,
+                "genre_paths": False,
+                "path_root": "/mnt/media/",
+                "paths": {
+                    "Anime-movies": ["anime"],
+                    "Kids": ["children, family"],
+                    "Docs": ["documentary"]
+                }
             },
             "trakt": {
                 "api": trakt_api,
-                "limit": 0,
-                "list": {
+                "imdb_info": False,
+                "limit": 5,
+                "tv_list": {
                     "anticipated": self.str2bool(trakt_list_anticipated),
                     "popular": self.str2bool(trakt_list_popular),
                     "trending": self.str2bool(trakt_list_trending)
+                },
+                "movie_list": {
+                    "anticipated": False,
+                    "popular": False,
+                    "trending": False
                 }
             },
             "pingrr": {
                 "timer": int(pingrr_timer),
-                "limit": int(pingrr_limit)
+                "limit": int(pingrr_limit),
+                "aired": 0
             },
             "pushover": {
                 "enabled": self.str2bool(pushover),
@@ -418,7 +446,10 @@ class Config(object):
                 "year": filters_year
             },
             "just_watch": {
-                "enabled": False,
+                "enabled": {
+                    "movies": False,
+                    "shows": False
+                },
                 "country": 'US',
                 "pages": 1
             },

@@ -4,9 +4,12 @@ import json
 import logging
 from logging.handlers import RotatingFileHandler
 import sys
+import requests
 
-from requests import post
 from time import sleep
+from imdb import IMDb
+
+i = IMDb()
 
 ################################
 # Logging
@@ -54,126 +57,188 @@ logger.addHandler(fileHandler)
 import pingrr.trakt as trakt
 import pingrr.sonarr as sonarr
 import pingrr.allflicks as allflicks
-import pingrr.justWatch as justwatch
+import pingrr.justWatch as justWatch
+import pingrr.radarr as radarr
 from pingrr.notifications import Notifications
 
-new_shows = []
+new = []
 delay_time = conf['pingrr']['timer'] * 3600
-options = {
-    "ignoreEpisodesWithFiles": False,
-    "ignoreEpisodesWithoutFiles": False,
-    "searchForMissingEpisodes": conf['sonarr']['search_missing_episodes']
-}
+options = {"ignoreEpisodesWithFiles": False, "ignoreEpisodesWithoutFiles": False,
+           "searchForMissingEpisodes": conf['sonarr']['search_missing_episodes']}
 notify = Notifications()
 
 if conf['pushover']['enabled']:
-    notify.load(
-        service="pushover",
-        app_token=conf['pushover']['app_token'],
-        user_token=conf['pushover']['user_token']
-    )
+    notify.load(service="pushover", app_token=conf['pushover']['app_token'], user_token=conf['pushover']['user_token'])
 
 if conf['slack']['enabled']:
-    notify.load(
-        service="slack",
-        webhook_url=conf['slack']['webhook_url'],
-        sender_name=conf['slack']['sender_name'],
-        sender_icon=conf['slack']['sender_icon'],
-        channel=conf['slack']['channel']
-    )
+    notify.load(service="slack", webhook_url=conf['slack']['webhook_url'], sender_name=conf['slack']['sender_name'],
+                sender_icon=conf['slack']['sender_icon'], channel=conf['slack']['channel'])
+
 
 ################################
 # Main
 ################################
 
 
-def send_to_sonarr(a, b):
+def create_path(genres, program):
+    """Create path based on genre for sonarr/radarr"""
+
+    # Set root folder for path creation
+    root_folder = conf[program]['path_root']
+
+    # Check if any of the genres match up
+    for key in conf[program]['paths']:
+        for genre in conf[program]['paths'][key]:
+            if genre in genres:
+                return root_folder + key + '/'
+    # If no match, return default path
+    return conf[program]['folder_path']
+
+
+def send_to_sonarr(a, b, genres):
     """Send found tv program to sonarr"""
 
-    payload = {
-        "tvdbId": a,
-        "title": b,
-        "qualityProfileId": conf['sonarr']['quality_profile'],
-        "images": [],
-        "seasons": [],
-        "seasonFolder": True,
-        "monitored": conf['sonarr']['monitored'],
-        "rootFolderPath": conf['sonarr']['folder_path'],
-        "addOptions": options,
-    }
+    path = create_path(genres, "sonarr")
 
-    r = post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=10)
+    payload = {"tvdbId": a, "title": b, "qualityProfileId": conf['sonarr']['quality_profile'], "images": [],
+               "seasons": [], "seasonFolder": True, "monitored": conf['sonarr']['monitored'], "rootFolderPath": path,
+               "addOptions": options, }
+
+    r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=10)
 
     if r.status_code == 201:
         logger.debug("sent to sonarr successfully")
-
         return True
 
     else:
         logger.debug("failed to send to sonarr, code return: %r", r.status_code)
-
         return False
 
 
-def add_shows():
-    sonarr_library = sonarr.get_library()
+def send_to_radarr(a, b, genres, year):
+    """Send found tv program to sonarr"""
+
+    path = create_path(genres, "radarr")
+
+    payload = {"tmdbId": a,
+               "title": b,
+               "qualityProfileId": conf['radarr']['quality_profile'],
+               "images": [],
+               "monitored": conf['radarr']['monitored'],
+               "titleSlug": b,
+               "rootFolderPath": path,
+               "minimumAvailability": "preDB",
+               "year": year
+               }
+
+    r = requests.post(radarr.url + '/api/movie', headers=radarr.headers, data=json.dumps(payload), timeout=10)
+
+    if r.status_code == 201:
+        logger.debug("sent to radarr successfully")
+        return True
+
+    else:
+        logger.debug("failed to send to radarr, code return: %r", r.status_code)
+        return False
+
+
+def add_media(program):
     added_list = []
     n = 0
-    limit = conf['pingrr']['limit']
 
-    for show in new_shows:
-        if show['tvdb'] not in sonarr_library:
-            title = show['title']
-            tvdb_id = show['tvdb']
+    limit = conf['pingrr']['limit'][program]
 
-            try:
-                logger.info('sending show to sonarr: {}'.format(show['title'].encode('utf8')))
+    for media in new:
+        title = media['title']
 
-                if send_to_sonarr(tvdb_id, title):
+        if program == "radarr":
+            media_id = media['tmdb']
+        elif program == "sonarr":
+            media_id = media['tvdb']
+
+        try:
+            logger.debug('Sending media to {}: {}'.format(program, media['title'].encode('utf8')))
+
+            if program == "sonarr":
+                if send_to_sonarr(media_id, title, media['genres']):
                     logger.info('{} has been added to Sonarr'.format(title.encode('utf8')))
-                    added_list.append(show['title'])
+                    added_list.append(media['title'])
 
-                    n += 1
+                    if media['aired'] >= conf['pingrr']['aired']:
+                        n += 1
+                    else:
+                        logger.info(
+                            "{} only has {} episodes, does not count towards add limit".format(media['title'].encode('utf8'),
+                                                                                               media['aired']))
                     if 0 < limit == n:
                         logger.info('{} shows added limit reached'.format(str(n)))
-
                         break
 
                     elif limit > 0 and not n == limit:
                         logger.debug('limit not yet reached: {}'.format(str(n)))
 
                 else:
-                    configuration.blacklist.add(str(show['tvdb']))
+                    configuration.blacklist.add(str(media["tvdb"]))
                     logger.warning('{} failed to be added to Sonarr! Adding to blacklist'.format(title.encode('utf8')))
 
-            except IOError:
-                logger.warning('error sending show: {} tvdbid: {}'.format(title.encode('utf8'), str(tvdb_id)))
+            if program == "radarr":
+                if send_to_radarr(media_id, title, media['genres'], media['year']):
+                    logger.info('{} has been added to Radarr'.format(title.encode('utf8')))
+                    added_list.append(media['title'])
+                    n += 1
+
+                    if 0 < limit == n:
+                        logger.info('{} shows added limit reached'.format(str(n)))
+                        break
+
+                    elif limit > 0 and not n == limit:
+                        logger.debug('limit not yet reached: {}'.format(str(n)))
+
+                else:
+                    configuration.blacklist.add(str(media["tmdb"]))
+                    logger.warning('{} failed to be added to Radarr! Adding to blacklist'.format(title.encode('utf8')))
+
+        except IOError:
+            logger.warning('error sending media: {} id: {}'.format(title.encode('utf8'), str(media_id)))
 
     if conf['pushover']['enabled'] or conf['slack']['enabled'] and n != 0:
-        if n > 1:
-            text = (str(n), "TV Show", "have", str(len(new_shows)))
-        else:
-            text = (str(n), "TV Show", "has", str(len(new_shows)))
-        message = "The following %s %s out of %s %s been added to Sonarr: " % text + "\n" + '\n'.join(added_list)
-        notify.send(message=message)
+        pass
+        # message = "The following {} item(s) out of {} added to {}: \n \n".format(str(n), str(len(new), program)
+        #                                                                          .join(added_list))
+        # notify.send(message=message)
 
 
-def new_check():
+def new_check(item_type):
     """Check for new trakt items in list"""
-    library = sonarr.get_library()
-    global new_shows
-    new_shows = filter_list()
-    logger.info('checking for new shows in lists')
-    for x in new_shows:
-        logger.debug('checking show from list: {}'.format(x['title']))
-        if x['tvdb'] not in library and conf['filters']['allow_ended']:
-            logger.info('new show(s) found, adding shows now')
-            add_shows()
+    if item_type == "movies":
+        library = radarr.get_library()
+        program = "radarr"
+    else:
+        library = sonarr.get_library()
+        program = "sonarr"
+
+    global new
+
+    new = filter_list(item_type)
+    logger.info('checking for new {} in lists'.format(item_type))
+
+    if item_type == "movies":
+        item_id = "imdb"
+    else:
+        item_id = "tvdb"
+
+    for x in new:
+        logger.debug('checking {} from list: {}'.format(item_type, x['title'].encode('utf8')))
+        if x[item_id] not in library and conf['filters']['allow_ended']:
+            logger.info('new media found, adding {} {} now'.format(len(new), item_type))
+            add_media(program)
             break
-        elif x['tvdb'] not in library and not x['status'] == 'ended':
-            logger.info('new continuing show(s) found, adding shows now')
-            add_shows()
-            break
+
+        if item_type == "shows":
+            if x[item_id] not in library and not x['status'] == 'ended':
+                logger.info('new continuing show(s) found, adding shows now')
+                add_media(program)
+                break
 
 
 def check_lists(arg, arg2):
@@ -184,88 +249,157 @@ def check_lists(arg, arg2):
     return False
 
 
-def filter_check(arg):
-    title = arg
-    country = title[0]['country']
-    lang = title[0]['language']
-    if str(title[0]['imdb']) in configuration.blacklist or str(title[0]['tvdb']) in configuration.blacklist:
-        logger.info("{} was rejected as it was found in the blacklist".format(title[0]['title'].encode('utf8')))
+def filter_check(title, item_type):
+
+    if item_type == "shows":
+        country = title['country']
+        type_id = "tvdb"
+        library = sonarr_library
+    elif item_type == "movies":
+        type_id = "tmdb"
+        library = radarr_library
+        country = False
+    else:
         return False
-    if conf['filters']['year'] > title[0]['year']:
-        logger.info("{} was rejected as it was outside allowed year range: {}".format(title[0]['title'].encode('utf8'),
-                                                                                      str(title[0]['year'])))
-        return False
-    if conf['filters']['runtime'] > title[0]['runtime']:
-        logger.info("{} was rejected as it was outside allowed runtime: {}".format(title[0]['title'].encode('utf8'),
-                                                                                   str(title[0]['runtime'])))
-        return False
-    if title[0]['network'] is None or conf['filters']['network'] in title[0]['network']:
-        logger.info("{} was rejected as it was by a disallowed network: {}".format(title[0]['title'].encode('utf8'),
-                                                                                   str(title[0]['network'])))
-        return False
-    if conf['filters']['votes'] > title[0]['votes']:
-        logger.info("{} was rejected as it did not meet vote requirement: {}".format(title[0]['title'].encode('utf8'),
-                                                                                     str(title[0]['votes'])))
-        return False
-    if conf['filters']['allow_ended'] is False and 'ended' in title[0]['status']:
-        logger.info("{} was rejected as it is an ended tv series".format(title[0]['title'].encode('utf8')))
-        return False
-    if conf['filters']['allow_canceled'] is False and 'canceled' in title[0]['status']:
-        logger.info("{} was rejected as it an canceled tv show".format(title[0]['title'].encode('utf8')))
-        return False
-    if float(title[0]['rating']) < float(conf['filters']['rating']):
-        logger.info("{} was rejected as it was outside the allowed ratings: {}".format(title[0]['title'].encode('utf8'),
-                                                                                       str(title[0]['rating'])))
-        return False
-    if isinstance(conf['filters']['genre'], list):
-        if check_lists('genre', title[0]['genres']):
-            logger.info("{} was rejected as it wasn't a wanted genre: {}".format(title[0]['title'].encode('utf8'),
-                                                                                 str(title[0]['genres'])))
+
+    lang = title['language']
+
+    if title[type_id] not in library:
+        if str(title['imdb']) in configuration.blacklist or str(title[type_id]) in configuration.blacklist:
+            logger.info("{} was rejected as it was found in the blacklist".format(title['title'].encode('utf8')))
             return False
-    elif conf['filters']['genre'] == title[0]['genres']:
-        logger.info("{} was rejected as it wasn't a wanted genre: {}".format(title[0]['title'].encode('utf8'),
-                                                                             str(title[0]['genres'])))
-        return False
-    if country not in conf['filters']['country']:
-        logger.info("{} was rejected as it wasn't a wanted country: {}".format(title[0]['title'].encode('utf8'),
-                                                                               str(title[0]['country'])))
-        return False
-    if lang not in conf['filters']['language']:
-        logger.info("{} was rejected as it wasn't a wanted language: {}".format(title[0]['title'].encode('utf8'),
-                                                                                str(title[0]['country'])))
-        return False
-    return True
+
+        if conf['filters']['year'] > title['year']:
+            logger.info(
+                "{} was rejected as it was outside allowed year range: {}".format(title['title'].encode('utf8'),
+                                                                                  str(title['year'])))
+            return False
+
+        if conf['filters']['runtime'] > title['runtime']:
+            logger.info("{} was rejected as it was outside allowed runtime: {}".format(title['title'].encode('utf8'),
+                                                                                       str(title['runtime'])))
+            return False
+
+        if item_type == "shows":
+            if title['network'] is None or conf['filters']['network'] in title['network']:
+                logger.info("{} was rejected as it was by a disallowed network: {}".format(title['title'].encode('utf8'),
+                                                                                           str(title['network'])))
+                return False
+
+        if conf['filters']['votes'] > title['votes']:
+            logger.info(
+                "{} was rejected as it did not meet vote requirement: {}".format(title['title'].encode('utf8'),
+                                                                                 str(title['votes'])))
+            return False
+
+        if conf['filters']['allow_ended'] is False and 'ended' in title['status']:
+            logger.info("{} was rejected as it is an ended tv series".format(title['title'].encode('utf8')))
+            return False
+
+        if item_type == "shows":
+            if conf['filters']['allow_canceled'] is False and 'canceled' in title['status']:
+                logger.info("{} was rejected as it an canceled tv show".format(title['title'].encode('utf8')))
+                return False
+
+        if float(title['rating']) < float(conf['filters']['rating']):
+            logger.info(
+                "{} was rejected as it was outside the allowed ratings: {}".format(title['title'].encode('utf8'),
+                                                                                   str(title['rating'])))
+            return False
+
+        if isinstance(conf['filters']['genre'], list):
+            if check_lists('genre', title['genres']):
+                logger.info("{} was rejected as it wasn't a wanted genre: {}".format(title['title'].encode('utf8'),
+                                                                                     str(title['genres'])))
+                return False
+
+        elif conf['filters']['genre'] == title['genres']:
+            logger.info("{} was rejected as it wasn't a wanted genre: {}".format(title['title'].encode('utf8'),
+                                                                                 str(title['genres'])))
+            return False
+
+        if country and country not in conf['filters']['country']:
+            logger.info("{} was rejected as it wasn't a wanted country: {}".format(title['title'].encode('utf8'),
+                                                                                   str(title['country'])))
+            return False
+
+        if lang not in conf['filters']['language']:
+            logger.info("{} was rejected as it wasn't a wanted language: {}".format(title['title'].encode('utf8'), lang))
+            return False
+        return True
+
+    else:
+        logger.info("{} was rejected as it is already in {} library".format(title['title'].encode('utf8'), item_type))
 
 
-def filter_list():
-    raw_list = trakt.create_list()
-    if conf['allflicks']['enabled']:
-        raw_list += allflicks.create_list()
-    if conf['just_watch']['enabled']:
-        raw_list += justwatch.create_list()
+def filter_list(list_type):
+    # Create the lists ready to be filtered down
+    if list_type == 'shows':
+        raw_list = []
+        item_id = "tvdb"
+        for trakt_list in conf['trakt']['tv_list']:
+            if conf['trakt']['tv_list'][trakt_list]:
+                raw_list = trakt.get_info('tv')
+                break
+        # if conf['allflicks']['enabled']['shows']:
+        #     raw_list += allflicks.create_list()
+        if conf['just_watch']['enabled']['shows']:
+            raw_list += justWatch.create_list("shows")
+    if list_type == 'movies':
+        item_id = "tmdb"
+        raw_list = []
+        for trakt_list in conf['trakt']['movie_list']:
+            if conf['trakt']['movie_list'][trakt_list]:
+                raw_list = trakt.get_info('movie')
+                break
+        if conf['just_watch']['enabled']['movies']:
+            raw_list += justWatch.create_list("movies")
+        fixed_raw = []
+        for raw in raw_list:
+            try:
+                fixed_raw.append(raw[0])
+            except KeyError:
+                fixed_raw.append(raw)
+        raw_list = fixed_raw
+
     filtered = []
+    logger.info(raw_list)
     for title in raw_list:
+        logger.info(title)
         try:
-            if filter_check(title):
-                logger.debug('adding {} to the list to check with sonarr'.format(title[0]['title'].encode('utf8')))
-                filtered.append(title[0])
+            # If not already in the list, check against filters
+            if filter_check(title, list_type) and title[item_id] not in filtered:
+                logger.debug('adding {} to potential add list'.format(title['title'].encode('utf8')))
+                filtered.append(title)
+            else:
+                logger.debug('{} is a dupe, already in potential list'.format(title['title'].encode('utf8')))
+                pass
         except TypeError:
-            logger.debug('{} failed to check against filters'.format(title[0]['title'].encode('utf8')))
+            logger.debug('{} failed to check against filters'.format(title['title'].encode('utf8')))
     logger.debug("Filtered list successfully")
     return filtered
 
 
-def remove_dupes(dupe_list):
-    deduped = []
-    for show in dupe_list:
-        if show not in deduped:
-            deduped.append(show)
-    return deduped
-
-
 if __name__ == "__main__":
     while True:
-        new_check()
+        if conf['sonarr']['api']:
+            try:
+                sonarr_library = sonarr.get_library()
+                new_check('shows')
+            except requests.exceptions.ReadTimeout:
+                logger.warning("Sonarr library timed out, skipping for now")
+            except requests.exceptions.ConnectionError:
+                logger.warning("Can not connect to Sonarr, check sonarr is running or host is correct")
+
+        if conf['radarr']['api']:
+            try:
+                radarr_library = radarr.get_library()
+                new_check('movies')
+            except requests.exceptions.ReadTimeout:
+                logger.warning("Radarr library timed out, skipping for now")
+            except requests.exceptions.ConnectionError:
+                logger.warning("Can not connect to Radarr, check Radarr is running or host is correct")
+
         # Save updated blacklist
         configuration.save_blacklist()
 
