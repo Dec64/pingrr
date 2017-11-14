@@ -363,7 +363,6 @@ def filter_list(list_type):
         raw_list = fixed_raw
 
     filtered = []
-    logger.info(raw_list)
     for title in raw_list:
         logger.info(title)
         try:
