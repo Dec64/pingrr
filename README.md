@@ -13,16 +13,16 @@ Currently supports:
 
 ## Getting Started
 
-You will need a trakt.tv account with a [Trakt api key](https://trakt.tv/oauth/applications/new),
-as well as your sonarr API.
+You will need a trakt.tv account with a [Trakt API key](https://trakt.tv/oauth/applications/new),
+as well as your Sonarr API.
 
 Quick warning when setting up the script. If you activate lots of lists with no filters,
 you will get a lot of shows that you may not want.
-At minimum it is recommended to use the language code filter and limit shows added per run.
+At a minimum, it is recommended to use the language code filter and limit shows added per run.
 
 ### Prerequisites
 
-You will need a Trakt account and an api key (client ID),
+You will need a Trakt account and an API key (client ID),
 you can create a new API app in trakt [here](https://trakt.tv/oauth/applications/new)
 
 1. Python 2.7
@@ -43,8 +43,8 @@ you can create a new API app in trakt [here](https://trakt.tv/oauth/applications
 
 `python pingrr.py`
 
-Follow the insutrctions in the console to complete the configuration file.
-This is only needed on the first run. Once complete you will need to re run pingrr.
+Follow the instructions in the console to complete the configuration file.
+This is only needed on the first run. Once complete you will need to re-run Pingrr.
 
 `python pingrr.py`
 
@@ -79,7 +79,7 @@ To list all possible arguments and options run:
 
 ### Blacklist
 
-There is a blacklist.json file created on first run. This file will
+There is a blacklist.json file created on the first run. This file will
 have failed shows and any show you want to add to it outside of filters that
 you never want to add. To add a show, either use the shows IMDB id or TVDB id.
 
@@ -107,7 +107,7 @@ all services justwatch supports in your chosen country for the last day.
 Set more pages to scan back more days, doing this will cause the scan to
 take longer and potentially add a lot of shows.
 
-Should support any two letter country code that Just Watch has data for.
+Should support any two-letter country code that Just Watch has data for.
 
 E.g:
 ```
@@ -137,7 +137,7 @@ and more
 
 ### Config
 
-There are a few config settings that are not set by the user on first run,
+There are a few config settings that are not set by the user on the first run
 if you fancy messing with more advanced settings you can open up the config.json
 file and change as needed.
 
@@ -260,11 +260,11 @@ Please see below for an explanation for the current config
 ```
 
 ##### `"rating_match":94`
-How close the match has to be out of 100 when parsing netflix titles.
+How close the match has to be out of 100 when parsing Netflix titles.
 If you feel you are missing some titles feel free to play with this figure, but anything lower
 then 90 will most likely result in incorrect matches.
 
-For the unwanted genres list, you need to type them as found on imdb, here are some examples:
+For the unwanted genres list, you need to type them as found on IMDB, here are some examples:
 
 ```
 comedy
@@ -292,7 +292,7 @@ suspense
 
 ### Start on boot
 
-To have pingrr start on boot on ubuntu
+To have pingrr start on boot on Ubuntu
 
 `cd /opt`
 
@@ -331,7 +331,7 @@ Then enabled and start it with:
 ***
 
 If you are have set pingrr to not loop (setting the timer to 0) then you
-must remove `Restart=always RestartSec=10` from systemd file, otherwise it will restart every 10seconds.
+must remove `Restart=always RestartSec=10` from systemd file, otherwise, it will restart every 10 seconds.
 
 ### Todo
 
@@ -342,8 +342,8 @@ must remove `Restart=always RestartSec=10` from systemd file, otherwise it will 
 Thanks to horjulf and l3uddz for assisting me with a few bits so far,
 and everyone that helped test it along the way.
 
-If you have any suggestions for features ect, feel free to create a new issue
-on github for it!
+If you have any suggestions for features ect feel free to create a new issue
+on GitHub for it!
 
 ### Donate
 
