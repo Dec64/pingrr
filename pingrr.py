@@ -45,10 +45,20 @@ logger.setLevel(configuration.settings['loglevel'])
 configuration.load()
 conf = configuration.config
 
+# Print config file to log on run
+logger.info(json.dumps(conf, sort_keys=True, indent=4, separators=(',', ': ')))
+
 # Log file handler
 fileHandler = RotatingFileHandler(configuration.settings['logfile'], maxBytes=1024 * 1024 * 2, backupCount=1)
 fileHandler.setFormatter(formatter)
 logger.addHandler(fileHandler)
+
+if conf['pingrr']['log_level'].upper() == "DEBUG":
+    logger.setLevel(logging.DEBUG)
+if conf['pingrr']['log_level'].upper() == "INFO":
+    logger.setLevel(logging.INFO)
+if conf['pingrr']['log_level'].upper() == "WARN":
+    logger.setLevel(logging.WARN)
 
 ################################
 # Init
@@ -370,7 +380,7 @@ def filter_list(list_type):
                 logger.debug('adding {} to potential add list'.format(title['title'].encode('utf8')))
                 filtered.append(title)
             else:
-                logger.debug('{} is a dupe, already in potential list'.format(title['title'].encode('utf8')))
+                #logger.debug('{} is a dupe, already in potential list'.format(title['title'].encode('utf8')))
                 pass
         except TypeError:
             try:
@@ -384,6 +394,9 @@ def filter_list(list_type):
 
 if __name__ == "__main__":
     while True:
+
+        logger.info("\n\n###### Checking if TV lists are wanted ######\n")
+
         if conf['sonarr']['api']:
             try:
                 sonarr_library = sonarr.get_library()
@@ -392,6 +405,8 @@ if __name__ == "__main__":
                 logger.warning("Sonarr library timed out, skipping for now")
             except requests.exceptions.ConnectionError:
                 logger.warning("Can not connect to Sonarr, check sonarr is running or host is correct")
+
+        logger.info("\n\n###### Checking if Movie lists are wanted ######\n")
 
         if conf['radarr']['api']:
             try:

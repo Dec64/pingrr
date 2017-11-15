@@ -72,8 +72,6 @@ def search(search_string, trakt_type):
         user_rating = y['rating']
         genre = y['genres']
         votes = y['votes']
-        
-        logger.info("Getting info for {}".format(title2))
 
         if conf['trakt']['imdb_info']:
             # Load imdb api for show/movie
@@ -114,7 +112,7 @@ def search(search_string, trakt_type):
                       'certification': y['certification'],
                       'released': y['released'],
                       'year': y['year']})
-            logger.debug('got movie show info successfully')
+            logger.debug("got {}'s info successfully".format(y['title']))
             return x
 
         # if TV details where requested return TV payload
@@ -133,7 +131,7 @@ def search(search_string, trakt_type):
                       'runtime': y['runtime'],
                       'year': y['year'],
                       'aired': y['aired_episodes']})
-            logger.debug('got tv show info successfully')
+            logger.debug("got {}'s info successfully".format(y['title']))
             return x
 
     else:
@@ -174,8 +172,6 @@ def get_trakt_data(name, cat):
         user_rating = obj['rating']
         genre = obj['genres']
         votes = obj['votes']
-        
-        logger.info("Getting info for {}".format(obj['title']))
 
         if conf['trakt']['imdb_info']:
 
@@ -216,7 +212,7 @@ def get_trakt_data(name, cat):
                       'certification': obj['certification'],
                       'released': obj['released'],
                       'year': obj['year']})
-            logger.debug('got movie: {} info successfully'.format(obj['title'].encode('utf8')))
+            logger.debug("got {}'s info successfully".format(obj['title']))
         else:
             x.append({'title': obj['title'],
                       'status': obj['status'],
@@ -232,7 +228,7 @@ def get_trakt_data(name, cat):
                       'runtime': obj['runtime'],
                       'year': obj['year'],
                       'aired': obj['aired_episodes']})
-            logger.debug('got tv show: {} info successfully'.format(obj['title'].encode('utf8')))
+            logger.debug("got {}'s info successfully".format(obj['title']))
     return x
 
 

@@ -108,7 +108,6 @@ def create_list(wanted):
                             # sleep(0.5)
 
                             if not skip:
-                                logger.debug(show_title)
                                 y = trakt.search(show_title, "show")
 
                                 if not y:
@@ -118,7 +117,6 @@ def create_list(wanted):
                                 if y:
                                     if y[0]['title'].lower().replace(":", "") == \
                                             item['show_title'].lower().replace(":", ""):
-                                        logger.debug(item['show_title'])
                                         tv_list.append(y[0])
                                 else:
                                     try:
@@ -149,7 +147,6 @@ def create_list(wanted):
 
                                 if y:
                                     if y[0]['title'].lower().replace(":", "") == item['title'].lower().replace(":", ""):
-                                        logger.debug(item['title'])
                                         movie_list.append(y[0])
                                 else:
                                     try:
