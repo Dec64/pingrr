@@ -443,7 +443,10 @@ class Config(object):
                 "votes": int(filters_votes),
                 "network": "",
                 "country": "",
-                "year": filters_year
+                "year": {
+                    "movies": 0,
+                    "shows": filters_year
+                    }
             },
             "just_watch": {
                 "enabled": {

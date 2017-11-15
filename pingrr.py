@@ -279,7 +279,7 @@ def filter_check(title, item_type):
             logger.info("{} was rejected as it was found in the blacklist".format(title['title'].encode('utf8')))
             return False
 
-        if conf['filters']['year'] > title['year']:
+        if conf['filters']['year'][item_type] > title['year']:
             logger.info(
                 "{} was rejected as it was outside allowed year range: {}".format(title['title'].encode('utf8'),
                                                                                   str(title['year'])))
