@@ -73,6 +73,8 @@ def search(search_string, trakt_type):
         user_rating = y['rating']
         genre = y['genres']
         votes = y['votes']
+        
+        logger.info("Getting info for {}".format(title2))
 
         if conf['trakt']['imdb_info']:
             # Load imdb api for show/movie
@@ -173,6 +175,8 @@ def get_trakt_data(name, cat):
         user_rating = obj['rating']
         genre = obj['genres']
         votes = obj['votes']
+        
+        logger.info("Getting info for {}".format(obj['title']))
 
         if conf['trakt']['imdb_info']:
 
