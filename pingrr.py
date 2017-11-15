@@ -212,10 +212,10 @@ def add_media(program):
             logger.warning('error sending media: {} id: {}'.format(title.encode('utf8'), str(media_id)))
 
     if conf['pushover']['enabled'] or conf['slack']['enabled'] and n != 0:
-        pass
-        # message = "The following {} item(s) out of {} added to {}: \n \n".format(str(n), str(len(new), program)
-        #                                                                          .join(added_list))
-        # notify.send(message=message)
+        message = "The following {} item(s) out of {} added to {}:\n{}".format(str(n), str(len(new)), program,
+                                                                               "\n".join(added_list))
+        logger.warning(message)
+        notify.send(message=message)
 
 
 def new_check(item_type):

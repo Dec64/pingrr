@@ -212,7 +212,7 @@ def get_trakt_data(name, cat):
                       'certification': obj['certification'],
                       'released': obj['released'],
                       'year': obj['year']})
-            logger.debug("got {}'s info successfully".format(obj['title']))
+            logger.debug("got {}'s info successfully".format(obj['title'].encode('utf8')))
         else:
             x.append({'title': obj['title'],
                       'status': obj['status'],
@@ -228,7 +228,7 @@ def get_trakt_data(name, cat):
                       'runtime': obj['runtime'],
                       'year': obj['year'],
                       'aired': obj['aired_episodes']})
-            logger.debug("got {}'s info successfully".format(obj['title']))
+            logger.debug("got {}'s info successfully".format(obj['title'].encode('utf8')))
     return x
 
 
