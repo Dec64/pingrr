@@ -373,7 +373,11 @@ def filter_list(list_type):
                 logger.debug('{} is a dupe, already in potential list'.format(title['title'].encode('utf8')))
                 pass
         except TypeError:
-            logger.debug('{} failed to check against filters'.format(title['title'].encode('utf8')))
+            try:
+                logger.info(title['title'])
+            except TypeError:
+                logger.info(title)
+            # logger.debug('{} failed to check against filters'.format(title['title'].encode('utf8')))
     logger.debug("Filtered list successfully")
     return filtered
 

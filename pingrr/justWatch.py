@@ -98,7 +98,7 @@ def create_list(wanted):
                         if item['object_type'] == 'show_season' and wanted == "shows":
 
                             for obj in tv_list:
-                                if item['show_title'].lower() in obj[0]['title'].lower():
+                                if item['show_title'].lower() in obj['title'].lower():
                                     skip = True
 
                             show_title = item['show_title']
@@ -119,7 +119,7 @@ def create_list(wanted):
                                     if y[0]['title'].lower().replace(":", "") == \
                                             item['show_title'].lower().replace(":", ""):
                                         logger.debug(item['show_title'])
-                                        tv_list.append(y)
+                                        tv_list.append(y[0])
                                 else:
                                     try:
                                         logger.debug("Failed to get data on show: {}".format(str(item['show_title'].encode('utf8'))))
@@ -131,7 +131,7 @@ def create_list(wanted):
                         elif item['object_type'] == 'movie' and wanted == "movies":
 
                             for obj in movie_list:
-                                if item['title'].lower() in obj[0]['title'].lower():
+                                if item['title'].lower() in obj['title'].lower():
                                     skip = True
                             movie_title = item['title']
                             #movie_title = re.sub(r'([^\s\w]|_)+', '', movie_title)
@@ -144,16 +144,16 @@ def create_list(wanted):
                                 y = trakt.search(movie_title, "movie")
 
                                 if not y:
-                                    logger.debug("failed to get movie continuing, will be missing some possible movies")
+                                    logger.info("failed to get movie continuing, will be missing some possible movies")
                                     break
 
                                 if y:
                                     if y[0]['title'].lower().replace(":", "") == item['title'].lower().replace(":", ""):
                                         logger.debug(item['title'])
-                                        movie_list.append(y)
+                                        movie_list.append(y[0])
                                 else:
                                     try:
-                                        logger.debug("Failed to get data on show: {}".format(str(item[movie_title].encode('utf8'))))
+                                        logger.info("Failed to get data on show: {}".format(str(item[movie_title].encode('utf8'))))
                                     except UnicodeEncodeError:
                                         logger.debug("Failed to get data on show, unicode error: {}".format(item))
 
@@ -163,6 +163,7 @@ def create_list(wanted):
     if wanted == "movies":
         logger.info("Just Watch list created, {} movies found".format(len(movie_list)))
         return movie_list
+
     elif wanted == "shows":
-        logger.info("Just Watch list created, {} movies found".format(len(tv_list)))
+        logger.info("Just Watch list created, {} shows found".format(len(tv_list)))
         return tv_list

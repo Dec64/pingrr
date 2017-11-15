@@ -1,6 +1,5 @@
 import logging
 import config
-import time
 import requests
 import urllib
 import re
