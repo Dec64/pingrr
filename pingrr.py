@@ -319,7 +319,7 @@ def filter_check(title, item_type):
                                                                                    str(title['rating'])))
             return False
         
-        logger.debug("Checking genres: {}".format(title['genres]))
+        logger.debug("Checking genres: {}".format(title['genres']))
         if isinstance(conf['filters']['genre'], list):
             if check_lists('genre', title['genres']):
                 logger.info("{} was rejected as it wasn't a wanted genre: {}".format(title['title'].encode('utf8'),
