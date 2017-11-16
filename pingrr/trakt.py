@@ -112,7 +112,7 @@ def search(search_string, trakt_type):
                       'certification': y['certification'],
                       'released': y['released'],
                       'year': y['year']})
-            logger.debug("got {}'s info successfully".format(y['title']))
+            logger.debug("got {}'s info successfully".format(y['title'].encode('utf8')))
             return x
 
         # if TV details where requested return TV payload
@@ -131,7 +131,7 @@ def search(search_string, trakt_type):
                       'runtime': y['runtime'],
                       'year': y['year'],
                       'aired': y['aired_episodes']})
-            logger.debug("got {}'s info successfully".format(y['title']))
+            logger.debug("got {}'s info successfully".format(y['title'].encode('utf8')))
             return x
 
     else:
