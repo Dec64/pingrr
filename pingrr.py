@@ -278,14 +278,14 @@ def filter_check(title, item_type):
         if str(title['imdb']) in configuration.blacklist or str(title[type_id]) in configuration.blacklist:
             logger.info("{} was rejected as it was found in the blacklist".format(title['title'].encode('utf8')))
             return False
-        logger.debug("Checking year: {}".format(title['year'])
+        logger.debug("Checking year: {}".format(title['year']))
         if conf['filters']['year'][item_type] > title['year']:
             logger.info(
                 "{} was rejected as it was outside allowed year range: {}".format(title['title'].encode('utf8'),
                                                                                   str(title['year'])))
             return False
         
-        logger.debug("Checking runtime: {}".format(title['runtime'])
+        logger.debug("Checking runtime: {}".format(title['runtime']))
         if conf['filters']['runtime'] > title['runtime']:
             logger.info("{} was rejected as it was outside allowed runtime: {}".format(title['title'].encode('utf8'),
                                                                                        str(title['runtime'])))
@@ -296,7 +296,7 @@ def filter_check(title, item_type):
                 logger.info("{} was rejected as it was by a disallowed network: {}".format(title['title'].encode('utf8'),
                                                                                            str(title['network'])))
                 return False
-        logger.debug("Checking votes: {}".format(title['votes'])
+        logger.debug("Checking votes: {}".format(title['votes']))
         if conf['filters']['votes'] > title['votes']:
             logger.info(
                 "{} was rejected as it did not meet vote requirement: {}".format(title['title'].encode('utf8'),
@@ -312,14 +312,14 @@ def filter_check(title, item_type):
                 logger.info("{} was rejected as it an canceled tv show".format(title['title'].encode('utf8')))
                 return False
             
-        logger.debug("Checking rating: {}".format(title['rating'])
+        logger.debug("Checking rating: {}".format(title['rating']))
         if float(title['rating']) < float(conf['filters']['rating']):
             logger.info(
                 "{} was rejected as it was outside the allowed ratings: {}".format(title['title'].encode('utf8'),
                                                                                    str(title['rating'])))
             return False
         
-        logger.debug("Checking genres: {}".format(title['genres]')
+        logger.debug("Checking genres: {}".format(title['genres]))
         if isinstance(conf['filters']['genre'], list):
             if check_lists('genre', title['genres']):
                 logger.info("{} was rejected as it wasn't a wanted genre: {}".format(title['title'].encode('utf8'),
@@ -331,12 +331,12 @@ def filter_check(title, item_type):
                                                                                  str(title['genres'])))
             return False
                                                         
-        logger.debug("Checking country: {}".format(country)
+        logger.debug("Checking country: {}".format(country))
         if country and country not in conf['filters']['country']:
             logger.info("{} was rejected as it wasn't a wanted country: {}".format(title['title'].encode('utf8'),
                                                                                    str(title['country'])))
             return False
-        logger.debug("Checking language: {}".format(lang)
+        logger.debug("Checking language: {}".format(lang))
         if lang not in conf['filters']['language']:
             logger.info("{} was rejected as it wasn't a wanted language: {}".format(title['title'].encode('utf8'), lang))
             return False
