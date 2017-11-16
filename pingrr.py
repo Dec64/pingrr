@@ -280,9 +280,8 @@ def filter_check(title, item_type):
             return False
         logger.debug("Checking year: {}".format(title['year']))
         if conf['filters']['year'][item_type] > title['year']:
-            logger.info(
-                "{} was rejected as it was outside allowed year range: {}".format(title['title'].encode('utf8'),
-                                                                                  str(title['year'])))
+            logger.info("{} was rejected as it was outside allowed year range: {}".format(title['title'].encode('utf8'), 
+                                                                                          str(title['year'])))
             return False
         
         logger.debug("Checking runtime: {}".format(title['runtime']))
