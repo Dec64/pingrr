@@ -114,7 +114,7 @@ def send_to_sonarr(a, b, genres):
                "seasons": [], "seasonFolder": True, "monitored": conf['sonarr']['monitored'], "rootFolderPath": path,
                "addOptions": options, }
 
-    r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=10)
+    r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=30)
 
     if r.status_code == 201:
         logger.debug("sent to sonarr successfully")
@@ -141,7 +141,7 @@ def send_to_radarr(a, b, genres, year):
                "year": year
                }
 
-    r = requests.post(radarr.url + '/api/movie', headers=radarr.headers, data=json.dumps(payload), timeout=10)
+    r = requests.post(radarr.url + '/api/movie', headers=radarr.headers, data=json.dumps(payload), timeout=30)
 
     if r.status_code == 201:
         logger.debug("sent to radarr successfully")
