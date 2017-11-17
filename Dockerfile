@@ -8,7 +8,15 @@ RUN \
   apk --no-cache -U upgrade && \
   # Install OS dependencies
   apk --no-cache -U add python2 && \
-  apk --no-cache -U add --virtual .build-deps git gcc linux-headers python2-dev musl-dev && \
+  apk --no-cache -U add --virtual .build-deps \
+    git \
+    gcc \
+    linux-headers \
+    python2-dev \
+    musl-dev \
+    libxml2-dev \
+    libxslt-dev \
+    && \
   # Python2 PIP
   python -m ensurepip && \
   # Get Pingrr
