@@ -53,13 +53,6 @@ fileHandler = RotatingFileHandler(configuration.settings['logfile'], maxBytes=10
 fileHandler.setFormatter(formatter)
 logger.addHandler(fileHandler)
 
-if conf['pingrr']['log_level'].upper() == "DEBUG":
-    logger.setLevel(logging.DEBUG)
-if conf['pingrr']['log_level'].upper() == "INFO":
-    logger.setLevel(logging.INFO)
-if conf['pingrr']['log_level'].upper() == "WARN":
-    logger.setLevel(logging.WARN)
-
 ################################
 # Init
 ################################
@@ -280,10 +273,10 @@ def filter_check(title, item_type):
             return False
         logger.debug("Checking year: {}".format(title['year']))
         if conf['filters']['year'][item_type] > title['year']:
-            logger.info("{} was rejected as it was outside allowed year range: {}".format(title['title'].encode('utf8'), 
+            logger.info("{} was rejected as it was outside allowed year range: {}".format(title['title'].encode('utf8'),
                                                                                           str(title['year'])))
             return False
-        
+
         logger.debug("Checking runtime: {}".format(title['runtime']))
         if conf['filters']['runtime'] > title['runtime']:
             logger.info("{} was rejected as it was outside allowed runtime: {}".format(title['title'].encode('utf8'),
@@ -305,31 +298,31 @@ def filter_check(title, item_type):
         if conf['filters']['allow_ended'] is False and 'ended' in title['status']:
             logger.info("{} was rejected as it is an ended tv series".format(title['title'].encode('utf8')))
             return False
-        
+
         if item_type == "shows":
             if conf['filters']['allow_canceled'] is False and 'canceled' in title['status']:
                 logger.info("{} was rejected as it an canceled tv show".format(title['title'].encode('utf8')))
                 return False
-            
+
         logger.debug("Checking rating: {}".format(title['rating']))
         if float(title['rating']) < float(conf['filters']['rating']):
             logger.info(
                 "{} was rejected as it was outside the allowed ratings: {}".format(title['title'].encode('utf8'),
                                                                                    str(title['rating'])))
             return False
-        
+
         logger.debug("Checking genres: {}".format(title['genres']))
         if isinstance(conf['filters']['genre'], list):
             if check_lists('genre', title['genres']):
                 logger.info("{} was rejected as it wasn't a wanted genre: {}".format(title['title'].encode('utf8'),
                                                                                      str(title['genres'])))
                 return False
-    
+
         elif conf['filters']['genre'] == title['genres']:
             logger.info("{} was rejected as it wasn't a wanted genre: {}".format(title['title'].encode('utf8'),
                                                                                  str(title['genres'])))
             return False
-                                                        
+
         logger.debug("Checking country: {}".format(country))
         if country and country not in conf['filters']['country']:
             logger.info("{} was rejected as it wasn't a wanted country: {}".format(title['title'].encode('utf8'),
