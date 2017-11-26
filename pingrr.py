@@ -9,7 +9,7 @@ import requests
 from time import sleep
 #from imdb import IMDb
 
-i = IMDb()
+#i = IMDb()
 
 ################################
 # Logging
