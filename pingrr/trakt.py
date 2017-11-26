@@ -4,7 +4,7 @@ import requests
 import urllib
 import re
 
-import imdb
+#import imdb
 
 ################################
 # Load config
@@ -22,7 +22,7 @@ logger = logging.getLogger(__name__)
 # Init
 ################################
 
-i = imdb.IMDb()
+#i = imdb.IMDb()
 
 data = []
 headers = {
