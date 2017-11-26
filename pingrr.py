@@ -7,7 +7,7 @@ import sys
 import requests
 
 from time import sleep
-from imdb import IMDb
+#from imdb import IMDb
 
 i = IMDb()
 
@@ -369,21 +369,18 @@ def filter_list(list_type):
         raw_list = fixed_raw
 
     filtered = []
+
     for title in raw_list:
         try:
             # If not already in the list, check against filters
             if filter_check(title, list_type) and title[item_id] not in filtered:
                 logger.debug('adding {} to potential add list'.format(title['title'].encode('utf8')))
                 filtered.append(title)
-            else:
-                #logger.debug('{} is a dupe, already in potential list'.format(title['title'].encode('utf8')))
-                pass
         except TypeError:
             try:
                 logger.info(title['title'])
             except TypeError:
-                logger.info(title)
-            # logger.debug('{} failed to check against filters'.format(title['title'].encode('utf8')))
+                logger.debug('{} failed to check against filters'.format(title['title'].encode('utf8')))
     logger.debug("Filtered list successfully")
     return filtered
 
