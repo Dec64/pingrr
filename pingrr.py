@@ -59,7 +59,7 @@ logger.addHandler(fileHandler)
 
 import pingrr.trakt as trakt
 import pingrr.sonarr as sonarr
-import pingrr.allflicks as allflicks
+
 import pingrr.justWatch as justWatch
 import pingrr.radarr as radarr
 from pingrr.notifications import Notifications
@@ -107,6 +107,9 @@ def send_to_sonarr(a, b, genres):
                "seasons": [], "seasonFolder": True, "monitored": conf['sonarr']['monitored'], "rootFolderPath": path,
                "addOptions": options, }
 
+    if conf['pingrr']['dry_run']:
+        return True
+
     r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=30)
 
     if r.status_code == 201:
@@ -133,6 +136,9 @@ def send_to_radarr(a, b, genres, year):
                "minimumAvailability": "preDB",
                "year": year
                }
+
+    if conf['pingrr']['dry_run']:
+        return True
 
     r = requests.post(radarr.url + '/api/movie', headers=radarr.headers, data=json.dumps(payload), timeout=30)
 

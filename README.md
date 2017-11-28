@@ -175,6 +175,7 @@ Please see below for an explanation for the current config
         "log_level": "info", ## Log level for pingrr
         "timer": 1.00, ## How long to wait, in hours, untill next scan
         "aired": 10 ## If show has less episodes then this aired, do not count towards limit
+        "dry_run": False ## Set to true to not add any shows, just test filter results
     },
     "pushover": {
         "app_token": "",

@@ -423,7 +423,8 @@ class Config(object):
                 },
                 "timer": int(pingrr_timer),
                 "log_level": "info",
-                "aired": 0
+                "aired": 0,
+                "dry_run": False
             },
             "pushover": {
                 "enabled": self.str2bool(pushover),
