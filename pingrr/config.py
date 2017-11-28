@@ -448,14 +448,14 @@ class Config(object):
                     "shows": filters_year
                     }
             },
-            "just_watch": {
-                "enabled": {
-                    "movies": False,
-                    "shows": False
-                },
-                "country": 'US',
-                "pages": 1
-            },
+            # "just_watch": {
+            #     "enabled": {
+            #         "movies": False,
+            #         "shows": False
+            #     },
+            #     "country": 'US',
+            #     "pages": 1
+            # },
             "allflicks": {
                 "enabled": self.str2bool(allflicks_enabled),
                 "rating_match": 94

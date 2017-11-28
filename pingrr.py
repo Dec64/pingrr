@@ -205,7 +205,7 @@ def add_media(program):
             logger.warning('error sending media: {} id: {}'.format(title.encode('utf8'), str(media_id)))
 
     if conf['pushover']['enabled'] or conf['slack']['enabled'] and n != 0:
-        message = "The following {} item(s) out of {} added to {}:\n{}".format(str(n), str(len(new)), program,
+        message = "The following {} item(s) out of {} added to {}:\n{}".format(str(len(added_list)), str(len(new)), program,
                                                                                "\n".join(added_list))
         logger.warning(message)
         notify.send(message=message)
@@ -284,9 +284,10 @@ def filter_check(title, item_type):
             return False
 
         if item_type == "shows":
-            if title['network'] is None or conf['filters']['network'] in title['network']:
-                logger.info("{} was rejected as it was by a disallowed network: {}".format(title['title'].encode('utf8'),
-                                                                                           str(title['network'])))
+            if len(conf['filters']['network']) > 0:
+                if title['network'] is None or conf['filters']['network'] in title['network']:
+                    logger.info("{} was rejected as it was by a disallowed network: {}"
+                                .format(title['title'].encode('utf8'),str(title['network'].encode('utf8'))))
                 return False
         logger.debug("Checking votes: {}".format(title['votes']))
         if conf['filters']['votes'] > title['votes']:
