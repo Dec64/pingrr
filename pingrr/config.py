@@ -340,13 +340,13 @@ class Config(object):
             slack_channel = ''
 
         print "\n"
-        print "####################################\n" \
-              "############ NETFLIX ###############\n" \
-              "####################################\n"
-        allflicks_enabled = raw_input("Enable recently added Netflix list?(yes/no): \n")
-        print '\033[94m' + str(self.str2bool(allflicks_enabled)) + '\x1b[0m' + '\n'
-
-        print "\n"
+        # print "####################################\n" \
+        #       "############ NETFLIX ###############\n" \
+        #       "####################################\n"
+        # allflicks_enabled = raw_input("Enable recently added Netflix list?(yes/no): \n")
+        # print '\033[94m' + str(self.str2bool(allflicks_enabled)) + '\x1b[0m' + '\n'
+        #
+        # print "\n"
         print "####################################\n" \
               "############ FILTERS ###############\n" \
               "####################################\n"
@@ -404,7 +404,7 @@ class Config(object):
             "trakt": {
                 "api": trakt_api,
                 "imdb_info": False,
-                "limit": 5,
+                "limit": 0,
                 "tv_list": {
                     "anticipated": self.str2bool(trakt_list_anticipated),
                     "popular": self.str2bool(trakt_list_popular),
@@ -417,8 +417,12 @@ class Config(object):
                 }
             },
             "pingrr": {
+                "limit": {
+                    "sonarr": int(pingrr_limit),
+                    "radarr": 0
+                },
                 "timer": int(pingrr_timer),
-                "limit": int(pingrr_limit),
+                "log_level": "info",
                 "aired": 0
             },
             "pushover": {
@@ -448,17 +452,13 @@ class Config(object):
                     "shows": filters_year
                     }
             },
-            # "just_watch": {
-            #     "enabled": {
-            #         "movies": False,
-            #         "shows": False
-            #     },
-            #     "country": 'US',
-            #     "pages": 1
-            # },
-            "allflicks": {
-                "enabled": self.str2bool(allflicks_enabled),
-                "rating_match": 94
+            "just_watch": {
+                "enabled": {
+                    "movies": False,
+                    "shows": False
+                },
+                "country": 'US',
+                "pages": 1
             }
         }
 
