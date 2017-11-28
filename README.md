@@ -162,7 +162,10 @@ Please see below for an explanation for the current config
         "rating": 3, ## Min rating show/movie must have to be added
         "runtime": 0, ## Min runtime show/movie must have to be added
         "votes": 1, ## Min votes show/movie must have to be added
-        "year": 0 ## Min year show/movie must be to be added (can do range. e.g. 2005-2007)
+        "year": {
+            "movies": 0, ## Min year movie must be to be added
+            "shows": 0 ## Min year show must be to be added
+        }
     },
     "pingrr": {
         "limit": {
