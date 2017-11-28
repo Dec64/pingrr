@@ -293,7 +293,7 @@ def filter_check(title, item_type):
             if len(conf['filters']['network']) > 0:
                 if title['network'] is None or conf['filters']['network'] in title['network']:
                     logger.info("{} was rejected as it was by a disallowed network: {}"
-                                .format(title['title'].encode('utf8'),str(title['network'].encode('utf8'))))
+                                .format(title['title'].encode('utf8'), str(title['network']).encode('utf8')))
                 return False
         logger.debug("Checking votes: {}".format(title['votes']))
         if conf['filters']['votes'] > title['votes']:
