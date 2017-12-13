@@ -112,10 +112,6 @@ def send_to_sonarr(a, b, genres):
 
     r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=30)
 
-
-    logger.info(r.content)
-    logger.info("test")
-
     if r.status_code == 201:
         logger.debug("sent to sonarr successfully")
         return True
