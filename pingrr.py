@@ -21,7 +21,7 @@ formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message
 # root logger
 logger = logging.getLogger()
 # Set initial level to INFO
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 # Console handler, log to stdout
 consoleHandler = logging.StreamHandler(sys.stdout)
@@ -112,6 +112,10 @@ def send_to_sonarr(a, b, genres):
 
     r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=30)
 
+
+    logger.info(r.content)
+    logger.info("test")
+
     if r.status_code == 201:
         logger.debug("sent to sonarr successfully")
         return True
@@ -142,7 +146,10 @@ def send_to_radarr(a, b, genres, year):
 
     r = requests.post(radarr.url + '/api/movie', headers=radarr.headers, data=json.dumps(payload), timeout=30)
 
+    response = r.json()
+
     if r.status_code == 201:
+        radarr.search_movie(response['id'])
         logger.debug("sent to radarr successfully")
         return True
 

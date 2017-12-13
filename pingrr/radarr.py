@@ -2,6 +2,7 @@ import logging
 import config
 import sys
 import requests
+import json
 
 ################################
 # Load config
@@ -25,6 +26,22 @@ headers = {'X-Api-Key': conf['radarr']['api']}
 ################################
 # Main
 ################################
+
+
+def search_movie(movie_id):
+
+    payload = {
+        "name": "moviesSearch",
+        "movieIds": [movie_id]
+               }
+
+    r = requests.post(url + '/api/command', headers=headers, data=json.dumps(payload), timeout=30)
+
+    if r.status_code == 201:
+        logger.info("radarr search request OK")
+        return True
+    else:
+        return False
 
 
 def get_library():
