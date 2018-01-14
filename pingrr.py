@@ -101,6 +101,8 @@ def create_path(genres, program):
 def send_to_sonarr(a, b, genres):
     """Send found tv program to sonarr"""
 
+    logger.info("Attempting to send to sonarr")
+    
     path = create_path(genres, "sonarr")
 
     payload = {"tvdbId": a, "title": b, "qualityProfileId": conf['sonarr']['quality_profile'], "images": [],
@@ -124,6 +126,8 @@ def send_to_sonarr(a, b, genres):
 
 def send_to_radarr(a, b, genres, year):
     """Send found tv program to sonarr"""
+    
+    logger.info("Attempting to send to sonarr")
 
     path = create_path(genres, "radarr")
 
