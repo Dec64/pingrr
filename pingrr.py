@@ -108,6 +108,7 @@ def send_to_sonarr(a, b, genres):
                "addOptions": options, }
 
     if conf['pingrr']['dry_run']:
+        logger.info("dry run is on, not sending to sonarr")              
         return True
 
     r = requests.post(sonarr.url + '/api/series', headers=sonarr.headers, data=json.dumps(payload), timeout=30)
@@ -138,6 +139,7 @@ def send_to_radarr(a, b, genres, year):
                }
 
     if conf['pingrr']['dry_run']:
+        logger.info("dry run is on, not sending to radarr")              
         return True
 
     r = requests.post(radarr.url + '/api/movie', headers=radarr.headers, data=json.dumps(payload), timeout=30)
