@@ -270,7 +270,10 @@ def check_lists(arg, arg2):
 def filter_check(title, item_type):
 
     if item_type == "shows":
-        country = title['country']
+        if len(title['country']):
+            country = title['country'].lower()
+        else:
+            country = False
         type_id = "tvdb"
         library = sonarr_library
     elif item_type == "movies":
@@ -348,6 +351,8 @@ def filter_check(title, item_type):
         if lang not in conf['filters']['language']:
             logger.info("{} was rejected as it wasn't a wanted language: {}".format(title['title'].encode('utf8'), lang))
             return False
+        logger.info("filter check show passed")
+        logger.info(title['title'])
         return True
 
     else:
@@ -390,16 +395,13 @@ def filter_list(list_type):
         try:
             # If not already in the list, check against filters
             if filter_check(title, list_type) and title[item_id] not in filtered:
-                logger.debug('adding {} to potential add list'.format(title['title'].encode('utf8')))
+                logger.info('adding {} to potential add list'.format(title['title'].encode('utf8')))
                 filtered.append(title)
         except TypeError:
-            try:
-                logger.info(title['title'])
-            except TypeError:
-                logger.debug('{} failed to check against filters'.format(title['title'].encode('utf8')))
+            logger.debug('{} failed to check against filters'.format(title['title'].encode('utf8')))
     logger.debug("Filtered list successfully")
-    return filtered
 
+    return filtered
 
 if __name__ == "__main__":
     while True:
