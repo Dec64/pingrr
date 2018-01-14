@@ -351,8 +351,6 @@ def filter_check(title, item_type):
         if lang not in conf['filters']['language']:
             logger.info("{} was rejected as it wasn't a wanted language: {}".format(title['title'].encode('utf8'), lang))
             return False
-        logger.info("filter check show passed")
-        logger.info(title['title'])
         return True
 
     else:
