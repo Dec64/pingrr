@@ -89,11 +89,13 @@ def create_path(genres, program):
     # Set root folder for path creation
     root_folder = conf[program]['path_root']
 
-    # Check if any of the genres match up
-    for key in conf[program]['paths']:
-        for genre in conf[program]['paths'][key]:
-            if genre in genres:
-                return root_folder + key + '/'
+    # Check if any of the genres match up, only if genre paths are in config
+    if 'paths' in conf[program]:
+        for key in conf[program]['paths']:
+            for genre in conf[program]['paths'][key]:
+                if genre in genres:
+                    return root_folder + key + '/'
+    
     # If no match, return default path
     return conf[program]['folder_path']
 
