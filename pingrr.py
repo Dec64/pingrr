@@ -127,9 +127,9 @@ def send_to_sonarr(a, b, genres):
 
 
 def send_to_radarr(a, b, genres, year):
-    """Send found tv program to sonarr"""
+    """Send found tv program to radarr"""
     
-    logger.info("Attempting to send to sonarr")
+    logger.info("Attempting to send to radarr")
 
     path = create_path(genres, "radarr")
 
