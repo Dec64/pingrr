@@ -257,6 +257,8 @@ def get_info(arg):
 
         trakt_complete_tv = []
 
+        logger.info(trakt_temp_tv)
+        
         for trakt_list in trakt_temp_tv:
             for line in trakt_list:
                 if line not in trakt_complete_tv:
