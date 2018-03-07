@@ -1,4 +1,4 @@
-# Check out traktarr https://github.com/l3uddz/traktarr for a cool alternative if pingrr isn't for you
+## Check out traktarr https://github.com/l3uddz/traktarr for a cool alternative if pingrr isn't for you
 
 ![alt text](http://img.pixady.com/2017/09/143837_pingrr.png)
 # pingrr.
